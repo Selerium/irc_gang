@@ -5,8 +5,7 @@ IRC::Pass::~Pass(){}
 
 void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server, int client_fd)
 {
-	
-    // 1) ---> set pass
+	// 1) ---> set pass
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty())
 	{
@@ -29,7 +28,7 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server, int clie
 		return;
 	}
 
-		//ADD CLIENT TO CLIENT MAP USING NEW ?
+		// ADD CLIENT TO CLIENT MAP USING NEW ?
 		server->clients_map[client_fd] = new Client(client_fd, 1);
 }
 
@@ -39,7 +38,7 @@ std::string IRC::Pass::getClientPass() { return this->_clientPass;}
 
 bool IRC::Pass::checkClientPass(Server* server)
 {
-	if (getClientPass() != server->getServerPass())
+	if (getClientPass() != server->getchannelPass())
 		return true;
 	return false;
 

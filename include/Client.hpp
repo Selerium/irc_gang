@@ -15,7 +15,7 @@ class Client
 	//bool _registerd;
 	bool	_isAuthanticated;
 
-	std::map<int, Channel *> Client_channels; // a map for the channes the client is registerd for 
+	// std::map<int, Channel *> channel_list;
 
 	public:
 		Client(int fd, int isAuthanticated);
@@ -24,6 +24,7 @@ class Client
 		std::string getUsername();
 		std::string getNickname();
 		std::string getHostname();
+		void setNickname(std::string name);
 
 };
 

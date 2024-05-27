@@ -102,7 +102,9 @@ void Server::add_new_client()
 	// Add the new client socket to the array
 	pfds[num_fd].fd = this->client_sockfd;
 	pfds[num_fd].events = POLLIN | POLLOUT; //BOTH READ AND WRITE EAVENT EILL BE CHECKED
+	this->clients_map[pfds[num_fd].fd] = new Client(pfds[num_fd].fd, false);
 	this->num_fd++;
+
 }
 
 void Server::read_message(int fd)
@@ -117,17 +119,23 @@ void Server::read_message(int fd)
 		// Remove the client socket from the array
 		close(pfds[fd].fd);
 		for (int j = fd; j < num_fd; ++j)
-            pfds[j] = pfds[j + 1];
-        num_fd--;
+			pfds[j] = pfds[j + 1];
+		num_fd--;
 	}
 	else
 	{
 		buffer[num_bytes] = '\0';
 		client_msg += buffer;
+
+		// messages sent my irssi
+		std::cout <<" --------------------------"<< std::endl;
+		std::cout << client_msg << std::endl;
+		std::cout << " --------------------------" << std::endl;
+
 		memset(buffer, 0, sizeof(buffer));
 		parse.getCommandInfo(client_msg);
 		parse.printcommandinfo();
-		IRC::Commands().executeCommand(&parse,NULL, this, this->client_sockfd);
+		IRC::Commands().executeCommand(&parse, this->clients_map[pfds[fd].fd], this, this->client_sockfd);
 	}
 	parse._messages.clear();
 }
@@ -164,12 +172,13 @@ void Server::setPort(std::string port)
 {
 	if (std::strtol(port.c_str(), NULL, 10) >= 0 && std::strtol(port.c_str(), NULL, 10) <= 1023)
 		throw ErrorException("port num is within resevrd range(0 - 1023)");
+		// check reserved avalable ports
 	this->port = port;
 }
 
-void Server::setPass(std::string pass) {this->_ServerPass = pass; }
+void Server::setPass(std::string pass) {this->_channelPass = pass; }
 
-std::string Server::getServerPass() { return this->_ServerPass;}
+std::string Server::getchannelPass() { return this->_channelPass;}
 
 ////////---------->>>>>>>> Getters <<<<<<<<<<--------------/////////
 

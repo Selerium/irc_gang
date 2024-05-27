@@ -9,13 +9,15 @@ void IRC::Cap::excuteCap(Parse *parse, Client* client, Server* server, int clien
 	(void)client;
 	(void)server;
 	(void)client_fd;
-    (void)parse;
+	(void)parse;
 
-	//test case
-	if (parse->getParameters()[0] == "LS")
-    	Parse().sendToClient("CAP * ACK :302 CAP LS\r\n", client_fd, "");
+	std::vector<std::string> parameters = parse->getParameters();
+	if (parameters.empty())
+		Parse().sendToClient("{EMPTY FIX LATER}\r\n", client_fd, "");
+	else if (parse->getParameters()[0] == "LS")
+		Parse().sendToClient("CAP * ACK :302 CAP LS\r\n", client_fd, "");
 	else if (parse->getParameters()[0] == "END")
-    	Parse().sendToClient("CAP * ACK :CAP END\r\n", client_fd, "");
+		Parse().sendToClient("CAP * ACK :CAP END\r\n", client_fd, "");
 
 
 

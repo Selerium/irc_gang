@@ -1,8 +1,9 @@
 #include "../include/Client.hpp"
 
-Client::Client(int fd, int isAuthanticated) : _Username(""), _Nickname("h"), _hostName("") ,_ClientFd(fd) , _isAuthanticated(isAuthanticated)
+Client::Client(int fd, int isAuthanticated) : _Username(""), _Nickname(""), _hostName("") ,_ClientFd(fd) , _isAuthanticated(isAuthanticated)
 {
 }
+
 
 int Client::getClientFd() {return this->_ClientFd; }
 
@@ -13,9 +14,3 @@ std::string Client::getUsername() { return this->_Username;}
 std::string Client::getNickname() { return this->_Nickname;}
 
 std::string Client::getHostname() { return this->_hostName;}
-
-void Client::setNickname(std::string name)
-{
-	this->_Nickname = name;
-}
-

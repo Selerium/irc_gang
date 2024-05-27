@@ -14,11 +14,10 @@ FILES = src/main.cpp \
 		src/commands/Ping.cpp \
 		src/commands/Cap.cpp \
 		src/commands/Quit.cpp \
-		src/Channel.cpp \
 
 
 
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 CXX = c++
 

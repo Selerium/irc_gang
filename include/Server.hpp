@@ -6,6 +6,7 @@
 
 class IRC;
 class Client;
+class Channel;
 class Parse;
 
 class Server
@@ -19,12 +20,15 @@ class Server
 		std::string port;
 		int client_sockfd;
 		std::string client_msg;
-		std::string _ServerPass;
+		std::string _channelPass;
+
 
 	public:
+		std::map<int, Channel *> channel_map;
 		std::map<int , Client *> clients_map;
-		struct pollfd *pfds;// an array of pollfd structures
+		
 
+		struct pollfd *pfds;// an array of pollfd structures
 
 		Server(char **argv);
 		~Server();
@@ -41,7 +45,7 @@ class Server
 		void setPort(std::string port);
 		void setPass(std::string pass);
 
-		std::string getServerPass();
+		std::string getchannelPass();
 
 		/// functions for testing - check clients and fds  //
 		void printClients();

@@ -64,7 +64,7 @@ void IRC::Commands::ping(Parse *parse, Client* client, Server* server, int clien
 
 void IRC::Commands::cap(Parse *parse, Client* client, Server* server, int client_fd)
 {
-    IRC::Cap().excuteCap(parse,client,server,client_fd);
+	IRC::Cap().excuteCap(parse,client,server,client_fd);
 }
 
 void IRC::Commands::quit(Parse *parse, Client* client, Server* server, int client_fd)

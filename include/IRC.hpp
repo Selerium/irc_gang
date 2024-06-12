@@ -79,10 +79,10 @@ public:
 			Join();
 			~Join();
 			void excuteJoin(Parse *parse, Client* client, Server* server, int client_fd);
-			void createChannel(std::string channelname, Server* server, Client* client);
+			void createChannel(std::string channelname, std::string pass, Server* server, Client* client);
 			bool channelPass(std::string channelname, std::string password, Server* server);
 			bool channelExist(std::string channelname, Server* server);
-
+			void joinChannel(std::string channelname, std::string pass, Server* server, Client* client);
 	};
 
 	class Nick 

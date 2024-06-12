@@ -9,17 +9,21 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server, int cli
 {
 	std::vector<std::string> parameter = parse->getParameters();
 
+	if	(client->getAuthantication() == false)
+		Parse().sendToClient("failed\r\n", client_fd, "");
+
 	//server exsist and pass is correct
 	if (server->channel_map.size() != 0)
 	{
+		if (parameter.size() == 0)
+			Parse().sendToClient("Parse error\r\n", client_fd, "");
 		//server doesnt exsist
 		if (channelExist(parameter[0], server) == false)
 		{
 			if (parameter.size() > 1)
-				createChannel(parameter[0], server, client);
+				createChannel(parameter[0], parameter[1], server, client);
 			else
-				createChannel(parameter[0], server, client);
-			Parse().sendToClient("Server exist\r\n", client_fd, "");
+				createChannel(parameter[0], std::string(""), server, client);
 		}
 		//server correct but pass wrong
 		else if (channelExist(parameter[0], server) == true && channelPass(parameter[0], parameter[1], server) == false)
@@ -35,17 +39,30 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server, int cli
 	(void)parse;
 }
 
-void IRC::Join::createChannel(std::string channelname, Server* server, Client* client)
+void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* server, Client* client)
+{
+		std::map<int, Channel *>::iterator it;
+
+	for(it = server->channel_map.begin(); it == server->channel_map.end(); it++)
+	{
+		if (it->second->getChannelName() == channelname)
+		{
+			it->second->addChanneluser(client);
+		}
+	}
+}
+
+void IRC::Join::createChannel(std::string channelname, std::string pass, Server* server, Client* client)
 {
 	if (server->channel_map.size() == 0)
-		server->channel_map.insert(std::make_pair(0, new Channel(channelname)));
+		server->channel_map.insert(std::make_pair(0, new Channel(channelname, pass)));
 	else
 	{
 		std::map<int, Channel *>::iterator it;
 		int	c = 0;
 		for(it = server->channel_map.begin(); it == server->channel_map.end(); it++)
 			c++;
-		server->channel_map.insert(std::make_pair(c, new Channel(channelname)));
+		server->channel_map.insert(std::make_pair(c, new Channel(channelname, pass)));
 	}
 	(void)client;
 }

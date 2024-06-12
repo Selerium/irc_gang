@@ -36,11 +36,10 @@ bool	valid_nick(std::string nickname)
 
 void	IRC::Nick::excuteNick(Parse *parse, Client* client, Server* server, int client_fd)
 {
-	// fix when i join as (nc localhost)
 	std::vector<std::string> parameter = parse->getParameters();
 
 	if (parameter.empty()) 
-		Parse().sendToClient(parameter[0] + ERROR_431, client_fd, "");
+		Parse().sendToClient(ERROR_431, client_fd, "");
 	else if (dup_names(parameter[0], server) == true)
 		Parse().sendToClient(parameter[0] + ERROR_433, client_fd, "");
 	else if (valid_nick(parameter[0]) == false)
@@ -50,6 +49,6 @@ void	IRC::Nick::excuteNick(Parse *parse, Client* client, Server* server, int cli
 		std::string oldnick = client->getNickname();
 		client->setNickname(parameter[0]);
 		oldnick = oldnick + " NICK " + parameter[0];
-		Parse().sendToClient("Nickname successfully changed", client_fd, "");
+		Parse().sendToClient(oldnick, client_fd, "");
 	}
 }

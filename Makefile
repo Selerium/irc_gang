@@ -18,7 +18,7 @@ FILES = src/main.cpp \
 
 
 
-CXXFLAGS = -Wall -Werror -Wextra -std=c++98
+CXXFLAGS = -std=c++98
 
 CXX = c++
 

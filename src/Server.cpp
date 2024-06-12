@@ -121,6 +121,7 @@ void Server::read_message(int fd)
 		for (int j = fd; j < num_fd; ++j)
 			pfds[j] = pfds[j + 1];
 		num_fd--;
+
 	}
 	else
 	{
@@ -128,14 +129,16 @@ void Server::read_message(int fd)
 		client_msg += buffer;
 
 		// messages sent my irssi
-		std::cout <<" --------------------------"<< std::endl;
-		std::cout << client_msg << std::endl;
-		std::cout << " --------------------------" << std::endl;
+		// std::cout <<" --------------------------"<< std::endl;
+		// std::cout << client_msg << std::endl;
+		// std::cout << " --------------------------" << std::endl;
 
 		memset(buffer, 0, sizeof(buffer));
 		parse.getCommandInfo(client_msg);
 		parse.printcommandinfo();
 		IRC::Commands().executeCommand(&parse, this->clients_map[pfds[fd].fd], this, this->client_sockfd);
+		// IRC::Commands().executeCommand(&parse, NULL, this, this->client_sockfd);
+
 	}
 	parse._messages.clear();
 }

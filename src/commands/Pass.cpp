@@ -29,7 +29,7 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server, int clie
 	}
 
 		// ADD CLIENT TO CLIENT MAP USING NEW ?
-		server->clients_map[client_fd] = new Client(client_fd, 1);
+		// server->clients_map[client_fd] = new Client(client_fd, 1);
 }
 
 void IRC::Pass::setClientPass(std::string pass) {this->_clientPass = pass;}

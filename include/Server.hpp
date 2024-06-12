@@ -4,6 +4,7 @@
 #include "IRC.hpp"
 #include "Parse.hpp"
 
+
 class IRC;
 class Client;
 class Channel;
@@ -26,7 +27,6 @@ class Server
 	public:
 		std::map<int, Channel *> channel_map;
 		std::map<int , Client *> clients_map;
-		
 
 		struct pollfd *pfds;// an array of pollfd structures
 

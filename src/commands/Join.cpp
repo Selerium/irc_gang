@@ -5,18 +5,18 @@ IRC::Join::Join(){}
 
 IRC::Join::~Join(){}
 
-void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 {
 	std::vector<std::string> parameter = parse->getParameters();
 
 	if	(client->getAuthantication() == false)
-		Parse().sendToClient("failed\r\n", client_fd, "");
+		client->SendServerToClient("failed\r\n");
 
 	//server exsist and pass is correct
 	if (server->channel_map.size() != 0)
 	{
 		if (parameter.size() == 0)
-			Parse().sendToClient("Parse error\r\n", client_fd, "");
+			client->SendServerToClient("Parse error\r\n");
 		//server doesnt exsist
 		if (channelExist(parameter[0], server) == false)
 		{
@@ -27,21 +27,17 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server, int cli
 		}
 		//server correct but pass wrong
 		else if (channelExist(parameter[0], server) == true && channelPass(parameter[0], parameter[1], server) == false)
-			Parse().sendToClient(ERROR_475, client_fd, "");
+			client->SendServerToClient(ERROR_475);
 		//server and pass correct
 		else
-			Parse().sendToClient("Server exist\r\n", client_fd, "");
+			client->SendServerToClient("Server exist\r\n");
 	}
-
-	(void)client;
-	(void)server;
-	(void)client_fd;
-	(void)parse;
 }
 
 void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* server, Client* client)
 {
-		std::map<int, Channel *>::iterator it;
+	std::map<int, Channel *>::iterator it;
+	(void)pass;
 
 	for(it = server->channel_map.begin(); it == server->channel_map.end(); it++)
 	{

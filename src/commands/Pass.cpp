@@ -3,33 +3,36 @@
 IRC::Pass::Pass(){}
 IRC::Pass::~Pass(){}
 
-void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server, int client_fd)
+void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 {
-	// 1) ---> set pass
+	
+    // 1) ---> set pass
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty())
 	{
-		Parse().sendToClient(ERROR_461, client_fd, "");
+		client->SendServerToClient(ERROR_461);
+		
+
 		return;
 	}
 	else
 		setClientPass(parameters[0]);
 
 	// 2) ---> check if client already authanticated??
-	if (ClientisAuthanticated(client, server, client_fd))
+
+	if (ClientisAuthanticated(client))
 	{
-		Parse().sendToClient(ERROR_462, client_fd, parse->getCommand());
+		client->SendServerToClient(ERROR_462);
 		return;
 	}
 
 	if (checkClientPass(server))
 	{
-		Parse().sendToClient(ERROR_464, client_fd, parse->getCommand());
+		client->SendServerToClient(ERROR_464);
 		return;
 	}
-
-		// ADD CLIENT TO CLIENT MAP USING NEW ?
-		// server->clients_map[client_fd] = new Client(client_fd, 1);
+	server->clients_map[client->getClientFd()]->setAuthantication(true);
+		
 }
 
 void IRC::Pass::setClientPass(std::string pass) {this->_clientPass = pass;}
@@ -38,21 +41,17 @@ std::string IRC::Pass::getClientPass() { return this->_clientPass;}
 
 bool IRC::Pass::checkClientPass(Server* server)
 {
-	if (getClientPass() != server->getchannelPass())
+	if (getClientPass() != server->getServerPass())
 		return true;
 	return false;
 
 }
 
-bool IRC::Pass::ClientisAuthanticated(Client* client, Server* server, int client_fd)
+bool IRC::Pass::ClientisAuthanticated(Client* client)
 {
-	(void)client;
-    // ---> Check if the client_fd exists in the clients_map
-
-    if (server->clients_map.find(client_fd) != server->clients_map.end())
-        return true;
-    // ---> Client not found, so it is not authenticated
-    return false;
+	if (client->getAuthantication() == true)
+		return true;
+	return false;
 }
 
 /*      Command: PASS

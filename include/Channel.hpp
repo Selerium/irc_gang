@@ -2,6 +2,9 @@
 #define CHANNEL_HPP
 
 #include "IRC.hpp"
+#include "Client.hpp"
+
+class Client; 
 
 class Channel
 {
@@ -9,7 +12,7 @@ class Channel
 		std::string _Name;
 		std::string _Password;
 		bool inviteOnly;
-		int *_Admins;
+		// int *_Admins;
 
 		// · l: Set/remove the user limit to channel
 

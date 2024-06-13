@@ -3,12 +3,13 @@
 
 #include "IRC.hpp"
 #include "Parse.hpp"
-
+#include "Channel.hpp"
 
 class IRC;
 class Client;
-class Channel;
 class Parse;
+class Channel;
+
 
 class Server
 {
@@ -21,18 +22,19 @@ class Server
 		std::string port;
 		int client_sockfd;
 		std::string client_msg;
-		std::string _channelPass;
+		std::string _ServerPass;
 
 
 	public:
-		std::map<int, Channel *> channel_map;
 		std::map<int , Client *> clients_map;
-
+		std::map<int, Channel *> channel_map;
 		struct pollfd *pfds;// an array of pollfd structures
+		std::string Msgbuffer;
+
 
 		Server(char **argv);
 		~Server();
-
+		// Channel channel;
 		void GetaddrInfo();
 		void socket_int();
 		void Bind_listen();
@@ -40,15 +42,16 @@ class Server
 
 		void start_IRC();
 		void add_new_client();
-		void read_message(int fd);
+		void read_message(int fd, Parse *parse);
 
 		void setPort(std::string port);
 		void setPass(std::string pass);
 
-		std::string getchannelPass();
+		std::string getServerPass();
 
 		/// functions for testing - check clients and fds  //
 		void printClients();
+		static void signalHandler(int signum);
 
 };
 

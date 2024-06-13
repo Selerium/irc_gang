@@ -11,64 +11,100 @@ IRC::Commands::Commands(){
 				commandMap["PING"] = &Commands::ping;
 				commandMap["CAP"] = &Commands::cap;
 				commandMap["QUIT"] = &Commands::quit;
+				commandMap["PRIVMSG"] = &Commands::privmsg;
+				// commandMap["KICK"] = &Commands::kick;
+				// commandMap["INVITE"] = &Commands::invite;
+				// commandMap["TOPIC"] = &Commands::topic;
 }
+
+// we need KICK , INVITE , TOPIC 
 
 IRC::Commands::~Commands(){}
 
-void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server, int client_fd) 
+void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server) 
 {
-    std::map<std::string, CommandFunction>::iterator it = commandMap.find( parse->getCommand());
-    if (it != commandMap.end())
-        (this->*(it->second))(parse,client, server, client_fd);
-    else 
-    {
-        //unknown command
-        Parse().sendToClient(ERROR_421, client_fd, Parse().getCommand());
-    }
+	while (!parse->_messages.empty())
+	{
+
+		std::map<std::string, CommandFunction>::iterator it = commandMap.find(parse->getCommand());
+		if (it != commandMap.end())
+		{
+			(this->*(it->second))(parse,client, server);
+			if (client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
+			{
+				WelcomeMsg(client);
+				client->setWelcomeMsg(true);
+			}
+
+		}
+		else 
+		{
+			//unknown command
+			client->SendServerToClient(": 421 "  ERROR_421  "\r\n");
+		}
+		parse->_messages.erase(parse->_messages.begin());
+	}
 }
 
-void IRC::Commands::pass(Parse *parse,Client* client, Server* server, int client_fd)
+void IRC::Commands::pass(Parse *parse,Client* client, Server* server)
 {
-    IRC::Pass().excutePass(parse,client,server,client_fd);
+    IRC::Pass().excutePass(parse,client,server);
 }
 
-void IRC::Commands::join(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::join(Parse *parse, Client* client, Server* server)
 {
-    IRC::Join().excuteJoin(parse,client,server,client_fd);
+    IRC::Join().excuteJoin(parse,client,server);
 }
 
-void IRC::Commands::nick(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::nick(Parse *parse, Client* client, Server* server)
 {
-    IRC::Nick().excuteNick(parse,client,server,client_fd);
+    IRC::Nick().excuteNick(parse,client,server);
 }
 
-void IRC::Commands::user(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::user(Parse *parse, Client* client, Server* server)
 {
-    IRC::User().excuteUser(parse,client,server,client_fd);
+    IRC::User().excuteUser(parse,client,server);
 }
 
-void IRC::Commands::whois(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::whois(Parse *parse, Client* client, Server* server)
 {
-    IRC::Whois().excuteWhois(parse,client,server,client_fd);
+    IRC::Whois().excuteWhois(parse,client,server);
 }
 
-void IRC::Commands::mode(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::mode(Parse *parse, Client* client, Server* server)
 {
-    IRC::Mode().excuteMode(parse,client,server,client_fd);
+    IRC::Mode().excuteMode(parse,client,server);
 }
 
-void IRC::Commands::ping(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::ping(Parse *parse, Client* client, Server* server)
 {
-    IRC::Ping().excutePing(parse,client,server,client_fd);
+    IRC::Ping().excutePing(parse,client,server);
 }
 
-void IRC::Commands::cap(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::cap(Parse *parse, Client* client, Server* server)
 {
-	IRC::Cap().excuteCap(parse,client,server,client_fd);
+    IRC::Cap().excuteCap(parse,client,server);
 }
 
-void IRC::Commands::quit(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Commands::quit(Parse *parse, Client* client, Server* server)
 {
-    IRC::Quit().excuteQuit(parse,client,server,client_fd);
+    IRC::Quit().excuteQuit(parse,client,server);
 }
 
+void IRC::Commands::privmsg(Parse *parse,Client* client, Server* server)
+{
+    IRC::Privmsg().excutePrivmsg(parse,client,server);
+}
+
+void IRC::Commands::WelcomeMsg(Client* client)
+{
+	std::string welcomeMsg = ":" 
+								" " RPL_WELCOME " "
+								+ client->getNickname()
+								+ " :Welcome to the Internet Relay Network, "
+								+ client->getNickname()
+								+ "!"
+								+ client->getUsername()
+								+ "\r\n";
+	client->SendServerToClient(welcomeMsg);					
+}

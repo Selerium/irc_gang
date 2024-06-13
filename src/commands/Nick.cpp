@@ -34,21 +34,22 @@ bool	valid_nick(std::string nickname)
 	return(true);
 }
 
-void	IRC::Nick::excuteNick(Parse *parse, Client* client, Server* server, int client_fd)
+void	IRC::Nick::excuteNick(Parse *parse, Client* client, Server* server)
 {
 	std::vector<std::string> parameter = parse->getParameters();
 
 	if (parameter.empty()) 
-		Parse().sendToClient(ERROR_431, client_fd, "");
+		client->SendServerToClient(ERROR_431 "\r\n");
 	else if (dup_names(parameter[0], server) == true)
-		Parse().sendToClient(parameter[0] + ERROR_433, client_fd, "");
+		client->SendServerToClient(parameter[0] + ERROR_433 + "\r\n");
 	else if (valid_nick(parameter[0]) == false)
-		Parse().sendToClient(parameter[0] + ERROR_432, client_fd, "");
+		client->SendServerToClient(parameter[0] + ERROR_432 + "\r\n");
 	else
 	{
 		std::string oldnick = client->getNickname();
 		client->setNickname(parameter[0]);
-		oldnick = oldnick + " NICK " + parameter[0];
-		Parse().sendToClient(oldnick, client_fd, "");
+		oldnick = oldnick + " NICK " + parameter[0] + "\r\n";
+		client->SendServerToClient(oldnick);
 	}
 }
+	

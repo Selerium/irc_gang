@@ -39,7 +39,7 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 	std::map<int, Channel *>::iterator it;
 	(void)pass;
 
-	for(it = server->channel_map.begin(); it == server->channel_map.end(); it++)
+	for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
 	{
 		if (it->second->getChannelName() == channelname)
 		{
@@ -56,7 +56,7 @@ void IRC::Join::createChannel(std::string channelname, std::string pass, Server*
 	{
 		std::map<int, Channel *>::iterator it;
 		int	c = 0;
-		for(it = server->channel_map.begin(); it == server->channel_map.end(); it++)
+		for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
 			c++;
 		server->channel_map.insert(std::make_pair(c, new Channel(channelname, pass)));
 	}
@@ -67,7 +67,7 @@ bool IRC::Join::channelPass(std::string channelname, std::string password, Serve
 {
 	std::map<int, Channel *>::iterator it;
 
-	for(it = server->channel_map.begin(); it == server->channel_map.end(); it++)
+	for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
 	{
 		if (it->second->getChannelName() == channelname)
 		{
@@ -83,7 +83,7 @@ bool IRC::Join::channelExist(std::string channelname, Server* server)
 {
 	std::map<int, Channel *>::iterator it;
 
-	for(it = server->channel_map.begin(); it == server->channel_map.end(); it++)
+	for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
 	{
 		if (it->second->getChannelName() == channelname)
 			return(true);

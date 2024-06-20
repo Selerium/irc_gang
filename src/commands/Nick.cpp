@@ -7,7 +7,7 @@ IRC::Nick::~Nick(){}
 bool	dup_names(std::string nickname, Server* server)
 {
 	std::map<int , Client *>::iterator it;
-	for(it = server->clients_map.begin(); it == server->clients_map.end(); it++)
+	for(it = server->clients_map.begin(); it != server->clients_map.end(); it++)
 	{
 		if (it->second->getNickname() == nickname)
 			return(true);

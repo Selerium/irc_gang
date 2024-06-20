@@ -12,7 +12,7 @@ void IRC::Privmsg::excutePrivmsg(Parse *parse, Client* client, Server* server)
 	if (ParseLine(parse, client) == false)
 	{
 		if (getMsg() == "")
-			client->SendServerToClient(": "  ERR_NOTEXTTOSEND  " :" + client->getNickname() + " :No text to send");
+			client->SendServerToClient(": "  ERR_NOTEXTTOSEND  " :" + client->getNickname() + " :No text to send\r\n");
 		else 
 			checkReceive(server, client);
 	}
@@ -50,7 +50,7 @@ bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
             }
             else if ((*it)[0] != ':' && !textFound)
             {
-                client->SendServerToClient(":" ERR_NOTEXTTOSEND ":" + client->getNickname() + " :No text to send");
+                client->SendServerToClient(":" ERR_NOTEXTTOSEND ":" + client->getNickname() + " :No text to send\r\n");
                 return true;
             }
             setMsg(*it + " ");
@@ -64,19 +64,35 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 {
 	if (getReceiver()[1] == '@' && getReceiver()[0] == '#')
 	{
-		///send for admins only in channel 
-		//client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + "  :No such nick/channel\r\n");
-		return;
+		std::map<int, Channel *>::iterator it;
+		for (it = server->channel_map.begin(); it !=server->channel_map.end(); ++it)
+		{
+			if (it->second->getChannelName() == getReceiver())
+			{
+				std::map<Client *, int>::iterator it2;
+				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
+				{
+					if (it->second->_clients.find(client)->second == 1)
+						it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
+				}
+				return;
+			}
+		}
 	}
 	else if (getReceiver()[0] == '#')
 	{
-		///send to all channel
-		// 1- LOOP OVER CHANNEL MAP , FIND CHANNEL 
-		//server->channel
-		/// GO IN CLIENTS map in that channel ,THEN LOOP OVER CLIENTS 
-		// AND SEND  MSG to each client 
+		std::map<int, Channel *>::iterator it;
+		for (it = server->channel_map.begin(); it !=server->channel_map.end(); ++it)
+		{
+			if (it->second->getChannelName() == getReceiver())
+			{
+				std::map<Client *, int>::iterator it2;
+				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
+					it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
+			return;
+			}
+		}
 		// maybe i should choeck for mode
-		return;
 	}
 	else if (getReceiver()[0] == '%' && getReceiver()[1] == '*' && getReceiver().length() == 2)
 	{
@@ -86,19 +102,19 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 	else 
 	{
 		std::map<int , Client *>::iterator it;
-		// //irterate for client!!!! 
 		if (!server->clients_map.empty())
 		{
 			for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
 			{
 				if (it->second->getNickname() == getReceiver())
+				{
 					server->clients_map[it->first]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
+					return;
+				}
 			}
 		}
-		return;
 	}
 	client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + "  :No such nick/channel\r\n");
-	return;
 }
 
 

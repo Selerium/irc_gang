@@ -2,9 +2,9 @@
 #define ERRORMSG_HPP
 
 
-#define ERROR_461 " :Not enough parameters"
-#define ERROR_462 ":You may not reregister"
-#define ERROR_464 ":Password incorrect"
+#define ERROR_461 "461"
+#define ERROR_462 "462"
+#define ERROR_464 "464"
 
 
 #define ERROR_451 " :You have not registered"
@@ -50,6 +50,26 @@
 
 #define ERROR_451 " :You have not registered"
 #define ERROR_421 " :Unknown command"
+
+
+#define ERR_NOSUCHCHANNEL "403"
+#define RPL_NOTOPIC "331"
+#define RPL_TOPIC "332"
+#define RPL_TOPICWHOTIME "333"
+#define ERR_NOTONCHANNEL "442"
+#define ERR_CHANOPRIVSNEEDED "482"
+
+#define ERR_USERNOTINCHANNEL "441"
+#define ERR_USERONCHANNEL "443"
+#define RPL_INVITING "341"
+
+
+
+
+
+
+
+
 /*
 001: RPL_WELCOME
 

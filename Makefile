@@ -16,6 +16,11 @@ FILES = src/main.cpp \
 		src/commands/Cap.cpp \
 		src/commands/Quit.cpp \
 		src/commands/Privmsg.cpp \
+		src/commands/Topic.cpp	\
+		src/commands/Kick.cpp	\
+		src/commands/Invite.cpp	\
+
+
 
 
 

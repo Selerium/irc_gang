@@ -47,10 +47,14 @@ public:
         void mode(Parse *parse,Client *client, Server *server);
         void ping(Parse *parse,Client *client, Server *server);
         void cap(Parse *parse,Client *client, Server *server);
-        void quit(Parse *parse,Client *client, Server *server);
 		void privmsg(Parse *parse,Client* client, Server* server);
+        void quit(Parse *parse,Client *client, Server *server);
+        void topic(Parse *parse,Client *client, Server *server);
+        void kick(Parse *parse,Client *client, Server *server);
+        void invite(Parse *parse,Client *client, Server *server);
 
 
+		
         void executeCommand(Parse *parse, Client *client, Server *server);
 		void WelcomeMsg(Client* client);
         
@@ -193,6 +197,55 @@ public:
 		   std::string getMsg();
 
 	};
+
+	class Topic 
+    {
+        private:
+
+        public:
+            Topic();
+            ~Topic();
+           void excuteTopic(Parse *parse, Client* client, Server* server);
+		   int parseMsg(Parse *parse, Client* client);
+		   void checkChannel(Client* client, Server* server);
+		   void CheckTopic(Client* client, Server* server);
+		   
+		   std::string setChannel;
+		   std::string topic;
+    };
+
+	class Kick 
+    {
+        private:
+
+        public:
+            Kick();
+            ~Kick();
+           void excuteKick(Parse *parse, Client* client, Server* server);
+		   int parseMsg(Parse *parse, Client* client);
+		   void checkChannel(Client* client, Server* server);
+
+		   std::string setChannel;
+		   std::string setkickNick;
+		   std::string comment;
+    };
+
+	class Invite 
+    {
+        private:
+
+        public:
+            Invite();
+            ~Invite();
+           void excuteInvite(Parse *parse, Client* client, Server* server);
+		   int parseMsg(Parse *parse, Client* client);
+		   void checkChannel(Client* client, Server* server);
+		   int checkUser(Client* client, Server* server);
+
+		   	std::string setChannel;
+			std::string setInviteNick;
+    };
+
 };
 
 

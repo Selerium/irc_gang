@@ -12,12 +12,11 @@ IRC::Commands::Commands(){
 				commandMap["CAP"] = &Commands::cap;
 				commandMap["QUIT"] = &Commands::quit;
 				commandMap["PRIVMSG"] = &Commands::privmsg;
-				// commandMap["KICK"] = &Commands::kick;
-				// commandMap["INVITE"] = &Commands::invite;
-				// commandMap["TOPIC"] = &Commands::topic;
+				commandMap["TOPIC"] = &Commands::topic;
+				commandMap["KICK"] = &Commands::kick;
+				commandMap["INVITE"] = &Commands::invite;
 }
 
-// we need KICK , INVITE , TOPIC 
 
 IRC::Commands::~Commands(){}
 
@@ -40,7 +39,7 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 		else 
 		{
 			//unknown command
-			client->SendServerToClient(": 421 "  ERROR_421  "\r\n");
+			client->SendServerToClient(": 421 "  ERROR_421  " " + parse->getCommand() + "\r\n");
 		}
 		parse->_messages.erase(parse->_messages.begin());
 	}
@@ -94,6 +93,22 @@ void IRC::Commands::quit(Parse *parse, Client* client, Server* server)
 void IRC::Commands::privmsg(Parse *parse,Client* client, Server* server)
 {
     IRC::Privmsg().excutePrivmsg(parse,client,server);
+}
+
+
+void IRC::Commands::topic(Parse *parse, Client* client, Server* server)
+{
+    IRC::Topic().excuteTopic(parse,client,server);
+}
+
+void IRC::Commands::kick(Parse *parse, Client* client, Server* server)
+{
+    IRC::Kick().excuteKick(parse,client,server);
+}
+
+void IRC::Commands::invite(Parse *parse, Client* client, Server* server)
+{
+    IRC::Invite().excuteInvite(parse,client,server);
 }
 
 void IRC::Commands::WelcomeMsg(Client* client)

@@ -10,7 +10,7 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty())
 	{
-		client->SendServerToClient(ERROR_461);
+		client->SendServerToClient(": " ERROR_461 " :Not enough parameters\r\n");
 		
 
 		return;
@@ -22,13 +22,13 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 
 	if (ClientisAuthanticated(client))
 	{
-		client->SendServerToClient(ERROR_462);
+		client->SendServerToClient(": " ERROR_462 " " + client->getNickname() + " :You may not reregister\r\n");
 		return;
 	}
 
 	if (checkClientPass(server))
 	{
-		client->SendServerToClient(ERROR_464);
+		client->SendServerToClient(": " ERROR_464 " :Password incorrect\r\n");
 		return;
 	}
 	server->clients_map[client->getClientFd()]->setAuthantication(true);

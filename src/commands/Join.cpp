@@ -13,8 +13,8 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 		client->SendServerToClient("failed\r\n");
 
 	//server exsist and pass is correct
-	if (server->channel_map.size() != 0)
-	{
+	// if (server->channel_map.size() != 0)
+	// {
 		if (parameter.size() == 0)
 			client->SendServerToClient("Parse error\r\n");
 		//server doesnt exsist
@@ -29,9 +29,11 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 		else if (channelExist(parameter[0], server) == true && channelPass(parameter[0], parameter[1], server) == false)
 			client->SendServerToClient(ERROR_475);
 		//server and pass correct
+		else if (parameter.size() > 1 && (channelExist(parameter[0], server) == true && channelPass(parameter[0], parameter[1], server) == true))
+			joinChannel(parameter[0], parameter[1], server, client);
 		else
-			client->SendServerToClient("Server exist\r\n");
-	}
+			joinChannel(parameter[0], std::string(""), server, client); 
+	// }
 }
 
 void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* server, Client* client)

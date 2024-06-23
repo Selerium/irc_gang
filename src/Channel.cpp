@@ -2,6 +2,7 @@
 
 Channel::Channel(std::string name, std::string pass) : _Name(name), _Password(pass) , _Topic("")
 {
+	this->_clientAmount = 0;
 	this->inviteOnly = false;
 }
 
@@ -14,8 +15,6 @@ bool Channel::getChannelMode() {return this->inviteOnly;}
 std::string Channel::getTopic(){return this->_Topic;}
 
 std::string Channel::getwhosetTopic(){return this->_whosetTopic;}
-
-
 
 void Channel::setChannelMode(bool mode)
 {

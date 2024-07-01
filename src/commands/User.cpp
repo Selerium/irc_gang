@@ -6,8 +6,6 @@ IRC::User::~User(){}
 
 void IRC::User::excuteUser(Parse *parse, Client* client, Server* server)
 {
-	(void)client;
-	(void)server;
 	(void)parse;
 
 	if (!client->getAuthantication())

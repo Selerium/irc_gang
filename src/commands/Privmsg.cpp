@@ -6,6 +6,10 @@ IRC::Privmsg::~Privmsg(){}
 
 void IRC::Privmsg::excutePrivmsg(Parse *parse, Client* client, Server* server)
 {
+	if	(client->getAuthantication() == false) {
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		return ;
+	}
 
 	setSender(client->getNickname());
 

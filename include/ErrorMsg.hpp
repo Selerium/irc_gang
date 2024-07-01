@@ -7,7 +7,7 @@
 #define ERROR_464 "464"
 
 
-#define ERROR_451 " :You have not registered"
+#define ERROR_451 "451"
 #define ERROR_421 " :Unknown command"
 
 #define RPL_WELCOME "001" 
@@ -48,7 +48,6 @@
 
 
 
-#define ERROR_451 " :You have not registered"
 #define ERROR_421 " :Unknown command"
 
 

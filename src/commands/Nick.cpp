@@ -38,7 +38,9 @@ void	IRC::Nick::excuteNick(Parse *parse, Client* client, Server* server)
 {
 	std::vector<std::string> parameter = parse->getParameters();
 
-	if (parameter.empty()) 
+	if (!client->getAuthantication())
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+	else if (parameter.empty()) 
 		client->SendServerToClient(ERROR_431 "\r\n");
 	else if (dup_names(parameter[0], server) == true)
 		client->SendServerToClient(parameter[0] + ERROR_433 + "\r\n");

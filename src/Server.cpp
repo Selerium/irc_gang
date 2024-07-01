@@ -212,8 +212,8 @@ void Server::setPass(std::string pass) {this->_ServerPass = pass; }
 
 std::string Server::getServerPass() { return this->_ServerPass;}
 
-void Server::setFdSize(int size) {
-	this->fd_size = size;
+void Server::setNumFds(int size) {
+	this->num_fd = size;
 }
 
 ////////---------->>>>>>>> Getters <<<<<<<<<<--------------/////////
@@ -222,6 +222,9 @@ int Server::getFdSize() const {
 	return this->fd_size;
 }
 
+int Server::getNumFds() const {
+	return this->num_fd;
+}
 
 void Server::printClients()
 {

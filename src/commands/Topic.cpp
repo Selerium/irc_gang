@@ -55,6 +55,7 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 			{
 				if (it->second->FindClient(client->getNickname()) != NULL)
 				{
+					// add condition depending on Topic permissions:
 					if (it->second->_clients.find(client)->second == 0)
 					{
 						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED " " + client->getNickname() + " " + setChannel

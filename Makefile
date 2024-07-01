@@ -1,4 +1,4 @@
-Name = IRC
+Name = ircserv
 
 FILES = src/main.cpp \
 		src/Parse.cpp \

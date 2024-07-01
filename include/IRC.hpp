@@ -12,6 +12,9 @@
 #include <sstream>
 #include <vector>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <csignal> 
+#include <cstdlib>
 
 #include "IRC.hpp"
 #include "Parse.hpp"
@@ -19,9 +22,9 @@
 #include "Server.hpp"
 #include "ErrorMsg.hpp"
 
-
 class Server;
 class Client;
+
 
 class IRC
 {
@@ -30,23 +33,30 @@ public:
     class Commands
     {
     public:
-        typedef void (Commands::*CommandFunction)(Parse *,Client *, Server *, int);
+        typedef void (Commands::*CommandFunction)(Parse *,Client *, Server *);
         std::map<std::string, CommandFunction> commandMap;
 
         Commands();
         ~Commands();
 
-        void pass(Parse *parse,Client *client, Server *server, int client_fd);
-        void join(Parse *parse,Client *client, Server *server, int client_fd);
-        void nick(Parse *parse,Client *client, Server *server, int client_fd);
-        void user(Parse *parse,Client *client, Server *server, int client_fd);
-        void whois(Parse *parse,Client *client, Server *server, int client_fd);
-        void mode(Parse *parse,Client *client, Server *server, int client_fd);
-        void ping(Parse *parse,Client *client, Server *server, int client_fd);
-        void cap(Parse *parse,Client *client, Server *server, int client_fd);
-        void quit(Parse *parse,Client *client, Server *server, int client_fd);
+        void pass(Parse *parse,Client *client, Server *server);
+        void join(Parse *parse,Client *client, Server *server);
+        void nick(Parse *parse,Client *client, Server *server);
+        void user(Parse *parse,Client *client, Server *server);
+        void whois(Parse *parse,Client *client, Server *server);
+        void mode(Parse *parse,Client *client, Server *server);
+        void ping(Parse *parse,Client *client, Server *server);
+        void cap(Parse *parse,Client *client, Server *server);
+		void privmsg(Parse *parse,Client* client, Server* server);
+        void quit(Parse *parse,Client *client, Server *server);
+        void topic(Parse *parse,Client *client, Server *server);
+        void kick(Parse *parse,Client *client, Server *server);
+        void invite(Parse *parse,Client *client, Server *server);
 
-        void executeCommand(Parse *parse, Client *client, Server *server, int client_fd);
+
+		
+        void executeCommand(Parse *parse, Client *client, Server *server);
+		void WelcomeMsg(Client* client);
         
     };
 
@@ -60,27 +70,28 @@ public:
         public:
             Pass();
             ~Pass();
-            void excutePass(Parse *parse,Client* client, Server* server, int client_fd);
+            void excutePass(Parse *parse,Client* client, Server* server);
             void setClientPass(std::string pas);
             std::string getClientPass();
             bool checkClientPass(Server* server);
-            bool ClientisAuthanticated(Client* client, Server* server, int client_fd);
+            bool ClientisAuthanticated(Client* client);
 
 
     };
 
-    class Join 
-    {
-        private:
+    	class Join 
+	{
+		private:
 
-        public:
-            Join();
-            ~Join();
-            void excuteJoin(Parse *parse, Client* client, Server* server, int client_fd);
-
-            
-
-    };
+		public:
+			Join();
+			~Join();
+			void excuteJoin(Parse *parse, Client* client, Server* server);
+			void createChannel(std::string channelname, std::string pass, Server* server, Client* client);
+			bool channelPass(std::string channelname, std::string password, Server* server);
+			bool channelExist(std::string channelname, Server* server);
+			void joinChannel(std::string channelname, std::string pass, Server* server, Client* client);
+	};
 
     class Nick 
     {
@@ -89,7 +100,7 @@ public:
         public:
             Nick();
             ~Nick();
-            void excuteNick(Parse *parse, Client* client, Server* server, int client_fd);
+            void excuteNick(Parse *parse, Client* client, Server* server);
 
     };
 
@@ -101,8 +112,8 @@ public:
         public:
             User();
             ~User();        
-           void excuteUser(Parse *parse, Client* client, Server* server, int client_fd);
-            bool isRegisterd(Server* server, int client_fd);
+           void excuteUser(Parse *parse, Client* client, Server* server);
+            bool isRegisterd(Server* server);
     };
     class Whois 
     {
@@ -111,7 +122,8 @@ public:
         public:
             Whois();
             ~Whois();
-           void excuteWhois(Parse *parse, Client* client, Server* server, int client_fd);
+           void excuteWhois(Parse *parse, Client* client, Server* server);
+
 
     };
     class Mode 
@@ -121,7 +133,7 @@ public:
         public:
             Mode();
             ~Mode();
-           void excuteMode(Parse *parse, Client* client, Server* server, int client_fd);
+           void excuteMode(Parse *parse, Client* client, Server* server);
 
     };
     class Ping 
@@ -131,7 +143,7 @@ public:
         public:
             Ping();
             ~Ping();
-           void excutePing(Parse *parse, Client* client, Server* server, int client_fd);
+           void excutePing(Parse *parse, Client* client, Server* server);
 
     };
     class Cap 
@@ -141,7 +153,7 @@ public:
         public:
             Cap();
             ~Cap();
-           void excuteCap(Parse *parse, Client* client, Server* server, int client_fd);
+           void excuteCap(Parse *parse, Client* client, Server* server);
 
 
     };
@@ -152,9 +164,88 @@ public:
         public:
             Quit();
             ~Quit();
-           void excuteQuit(Parse *parse, Client* client, Server* server, int client_fd);
+           void excuteQuit(Parse *parse, Client* client, Server* server);
 
     };
+
+	class Privmsg
+	{
+		private:
+			std::string _receiver;
+			std::string _Msg;
+			std::string _Sender;
+
+
+
+
+        public:
+            Privmsg();
+            ~Privmsg();
+           void excutePrivmsg(Parse *parse, Client* client, Server* server);
+		   bool ParseLine(Parse *parse, Client* client);
+		   void checkReceive(Server* server, Client* client);
+		   void sendToAll(Server* server);
+
+		   void setReceiver(std::string str);
+		   void setMsg(std::string str);
+		   void setSender(std::string str);
+
+		//    void sendClientToClient(Server* server);
+
+		   std::string getSender();
+		   std::string getReceiver();
+		   std::string getMsg();
+
+	};
+
+	class Topic 
+    {
+        private:
+
+        public:
+            Topic();
+            ~Topic();
+           void excuteTopic(Parse *parse, Client* client, Server* server);
+		   int parseMsg(Parse *parse, Client* client);
+		   void checkChannel(Client* client, Server* server);
+		   void CheckTopic(Client* client, Server* server);
+		   
+		   std::string setChannel;
+		   std::string topic;
+    };
+
+	class Kick 
+    {
+        private:
+
+        public:
+            Kick();
+            ~Kick();
+           void excuteKick(Parse *parse, Client* client, Server* server);
+		   int parseMsg(Parse *parse, Client* client);
+		   void checkChannel(Client* client, Server* server);
+
+		   std::string setChannel;
+		   std::string setkickNick;
+		   std::string comment;
+    };
+
+	class Invite 
+    {
+        private:
+
+        public:
+            Invite();
+            ~Invite();
+           void excuteInvite(Parse *parse, Client* client, Server* server);
+		   int parseMsg(Parse *parse, Client* client);
+		   void checkChannel(Client* client, Server* server);
+		   int checkUser(Client* client, Server* server);
+
+		   	std::string setChannel;
+			std::string setInviteNick;
+    };
+
 };
 
 

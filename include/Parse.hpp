@@ -2,6 +2,10 @@
 #define MSG_PARSING_HPP	
 
 #include "IRC.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
+
+class Client;
 
 class Parse
 {
@@ -11,10 +15,10 @@ class Parse
 	Parse();
 	~Parse();
 
-	void getCommandInfo(const std::string& clientMsg);
+	void getCommandInfo(const std::string& clientMsg, Client *client);
 	void Debug_msg(std::string msg);
 	void printcommandinfo();
-	void sendToClient(std::string msg, int ClientFd, std::string command);
+	void sendToClient(Client *client);
 
 	std::vector<std::string> getParameters();
 	std::string getCommand();

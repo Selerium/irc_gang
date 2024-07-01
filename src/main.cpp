@@ -8,15 +8,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	try
-	{
-		Server server(argv);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << "ERROR: "  << e.what() << '\n';
-		return 1;
-	}
+	Server server(argv);
 	return 0;
 	
 }

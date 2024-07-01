@@ -1,9 +1,10 @@
-Name = IRC
+Name = ircserv
 
 FILES = src/main.cpp \
 		src/Parse.cpp \
 		src/Server.cpp \
 		src/Client.cpp \
+		src/Channel.cpp	\
 		src/commands/Commands.cpp \
 		src/commands/Pass.cpp \
 		src/commands/Join.cpp \
@@ -14,6 +15,12 @@ FILES = src/main.cpp \
 		src/commands/Ping.cpp \
 		src/commands/Cap.cpp \
 		src/commands/Quit.cpp \
+		src/commands/Privmsg.cpp \
+		src/commands/Topic.cpp	\
+		src/commands/Kick.cpp	\
+		src/commands/Invite.cpp	\
+
+
 
 
 

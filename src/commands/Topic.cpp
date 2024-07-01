@@ -68,10 +68,10 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 							+ " :No topic is set\r\n");
 						else 
 							it->second->setwhosetTopic(client->getNickname());
-							client->SendServerToClient(": " RPL_TOPIC " " + client->getNickname() 
-								+ " " + setChannel + ":" + it->second->getTopic() + "\r\n");
-							client->SendServerToClient(": " RPL_TOPICWHOTIME " " + client->getNickname() 
-							+ " " + setChannel + " " + it->second->getwhosetTopic() +  "\r\n");
+						client->SendServerToClient(": " RPL_TOPIC " " + client->getNickname() 
+							+ " " + setChannel + ":" + it->second->getTopic() + "\r\n");
+						client->SendServerToClient(": " RPL_TOPICWHOTIME " " + client->getNickname() 
+						+ " " + setChannel + " " + it->second->getwhosetTopic() +  "\r\n");
 						return;
 					}
 					else if (topic ==  " ")

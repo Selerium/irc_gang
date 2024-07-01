@@ -12,6 +12,8 @@ class Channel
 		std::string	_Name;
 		std::string	_Password;
 		bool		_inviteOnly;
+		bool		_setLimit;
+		bool		_topicMode;
 		std::string	_Topic;
 		std::string	_whosetTopic;
 		int			_limit;
@@ -30,18 +32,17 @@ class Channel
 
 		std::string getChannelName();
 		std::string getChannelPassword();
+		bool		getChannelMode();
 		std::string getTopic();
 		std::string getwhosetTopic();
 		int			getLimit();
+		bool		getsetLimit();
+		bool		getTopicMode();
 
-		bool getChannelMode();
 
-		void setChannelMode(Client* client, bool mode);
-		void setTopic(std::string str);
+		void setTopic(Client* client, std::string str);
 		void setwhosetTopic(std::string str);
 
-		void setPass(Client* client, std::string str);
-		void removePass(Client* client);
 
 		void addChanneluser(Client* client);
 		
@@ -50,12 +51,19 @@ class Channel
 		Client* FindClient(std::string clientNick);
 		void sendToall(std::string msg);
 		void removeNick(Client* client, std::string nick);
-
-		void Permissions(Client* admin, Client* client, bool perm);
-
-		void setLimiter(Client* client, int amount);
-
 		int checkPermission(Client* client);
+
+//MODESTUFF
+		void removeLimit(Client* client);
+		void setLimiter(Client* client, int amount);
+		void setPass(Client* client, std::string str);
+		void removePass(Client* client);
+		void setChannelMode(Client* client, bool mode);
+		void Permissions(Client* admin, Client* client, bool perm);
+		void SetTopicMode(Client* client, bool mode);
+
+
+
 
 
 };

@@ -18,21 +18,18 @@ std::string Channel::getwhosetTopic(){return this->_whosetTopic;}
 
 int Channel::getLimit(){return this->_limit;}
 
-void Channel::setChannelMode(Client* client, bool mode)
-{
-	if (checkPermission(client) == 1)
-	{
-		this->_inviteOnly = mode;
-		if (this->_inviteOnly == true)
-			this->_limit = _clientAmount;
-	}
-	else
-		client->SendServerToClient(": No permissions to change mode");
-}
+bool Channel::getsetLimit(){return this->_setLimit;}
 
-void Channel::setTopic(std::string str)
+void Channel::setTopic(Client* client, std::string str)
 {
-	this->_Topic = str;
+	if (getTopicMode() == true)
+		if (checkPermission(client))
+		{
+			this->_Topic = str;
+			setwhosetTopic(client->getNickname());
+		}
+	else
+		this->_Topic = str;
 }
 
 void Channel::setwhosetTopic(std::string str)
@@ -40,19 +37,7 @@ void Channel::setwhosetTopic(std::string str)
 	this->_whosetTopic = str;
 }
 
-void Channel::setPass(Client* client, std::string str)
-{
-	if (checkPermission(client) == 1)
-		this->_Password = str;
-	else
-		client->SendServerToClient(": No permissions to change pass");
-}
-
-void Channel::removePass(Client* client)
-{
-	if (checkPermission(client) == 1)
-		this->_Password = "";
-}
+bool Channel::getTopicMode() {return this->_topicMode;}
 
 void Channel::addChanneluser(Client* client)
 {
@@ -61,28 +46,31 @@ void Channel::addChanneluser(Client* client)
 		this->_clients.insert(std::make_pair(client, 1));
 		this->_clientAmount++;
 	}
+	else if (getsetLimit() == true)
+	{
+
+	}
 	else if (getChannelMode() == true)
 	{
 		if (_clientAmount >= getLimit())
-			//print that its reached its limit
-			return;
-		std::map<Client *, int>::iterator it;
-		for(it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
-			if (it->first->getNickname() == client->getNickname() && 
-				it->second == 2)
-				it->second = 0;
+			client->SendServerToClient("Already reached limit of users in channel");
+			return;
 		}
+		std::map<Client *, int>::iterator it;
+		it = this->_clients.find(client);
+		if (it->first->getNickname() == client->getNickname() && it->second == 2)
+			it->second = 0;
 		this->_clientAmount++;
 	}
 	else
 	{
 		std::map<Client *, int>::iterator it;
-		for(it = this->_clients.begin(); it != this->_clients.end(); it++)
+		it = this->_clients.find(client);
+		if (it->first->getNickname() == client->getNickname())
 		{
-			if (it->first->getNickname() == client->getNickname())
-				//already joined
-				break;
+			client->SendServerToClient("Already in server");
+			return;
 		}
 		this->_clients.insert(std::make_pair(client, 0));
 		this->_clientAmount++;
@@ -130,50 +118,11 @@ void Channel::removeNick(Client* client, std::string nick)
 	if (checkPermission(client) != 1)
 		client->SendServerToClient("NO PERMISSIONS");
 	std::map<Client *, int>::iterator it;
-	for(it = this->_clients.begin(); it != this->_clients.end(); it++)
-	{
-		if (it->first->getNickname() == nick)
-			this->_clients.erase(it->first);
-	}
+	it = this->_clients.find(client);
+	if (it->first->getNickname() == nick)
+		this->_clients.erase(it->first);
 }
 
-void Channel::Permissions(Client* admin, Client* client, bool perm)
-{
-	if (checkPermission(admin) != 1)
-	{
-		admin->SendServerToClient(": No permissions");
-		return;
-	}
-	else if (checkPermission(client) == 2)
-	{
-		client->SendServerToClient(": User did not join yet");
-		return;
-	}
-	std::map<Client *, int>::iterator it;
-	for(it = this->_clients.begin(); it != this->_clients.end(); it++)
-	{
-		if (it->first->getNickname() == client->getNickname())
-		{
-			if (perm == true)
-				it->second = 1;
-			else
-				it->second = 0;
-		}
-	}
-}
-
-void Channel::setLimiter(Client* client, int amount)
-{
-	if (checkPermission(client) == 1)
-	{
-		if (this->_clientAmount > amount)
-			this->_limit = this->_clientAmount;
-		else
-			this->_limit = amount;
-		return;
-	}
-	client->SendServerToClient(": No permissions");
-}
 
 int Channel::checkPermission(Client* client)
 {

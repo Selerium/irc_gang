@@ -6,9 +6,13 @@ IRC::Kick::~Kick(){}
 
 void IRC::Kick::excuteKick(Parse *parse, Client* client, Server* server)
 {
+	if	(client->getAuthantication() == false) {
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		return ;
+	}
+
 	if (parseMsg(parse, client) != 1)
 		checkChannel(client, server);
-
 }
 
 int IRC::Kick::parseMsg(Parse *parse, Client* client)

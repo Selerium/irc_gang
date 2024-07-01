@@ -6,6 +6,11 @@ IRC::Whois::~Whois(){}
 
 void IRC::Whois::excuteWhois(Parse *parse, Client* client, Server* server)
 {
+	if	(client->getAuthantication() == false) {
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		return ;
+	}
+
 	if (!parse->getParameters().empty())
 	{
 		std::map<int , Client *>::iterator it;

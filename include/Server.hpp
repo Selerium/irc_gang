@@ -46,8 +46,11 @@ class Server
 
 		void setPort(std::string port);
 		void setPass(std::string pass);
+		void setNumFds(int size);
 
 		std::string getServerPass();
+		int getFdSize() const;
+		int getNumFds() const;
 
 		/// functions for testing - check clients and fds  //
 		void printClients();

@@ -1,4 +1,4 @@
-Name = IRC
+Name = ircserv
 
 FILES = src/main.cpp \
 		src/Parse.cpp \
@@ -24,7 +24,7 @@ FILES = src/main.cpp \
 
 
 
-CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 CXX = c++
 

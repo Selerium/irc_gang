@@ -212,8 +212,19 @@ void Server::setPass(std::string pass) {this->_ServerPass = pass; }
 
 std::string Server::getServerPass() { return this->_ServerPass;}
 
+void Server::setNumFds(int size) {
+	this->num_fd = size;
+}
+
 ////////---------->>>>>>>> Getters <<<<<<<<<<--------------/////////
 
+int Server::getFdSize() const {
+	return this->fd_size;
+}
+
+int Server::getNumFds() const {
+	return this->num_fd;
+}
 
 void Server::printClients()
 {
@@ -224,7 +235,7 @@ void Server::printClients()
 		for (it = this->clients_map.begin(); it != this->clients_map.end() ;++it)
 		{
 			if (it->first && it->second)
-				std::cout << it->first << std::endl; 
+				std::cout << it->second->getClientFd() << " " << it->second->getUsername() << std::endl; 
 		}
 	}
 

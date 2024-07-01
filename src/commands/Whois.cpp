@@ -14,6 +14,7 @@ void IRC::Whois::excuteWhois(Parse *parse, Client* client, Server* server)
 			for (it = server->clients_map.begin(); it != server->clients_map.end() ; ++it)
 			{
 				parse->Debug_msg(it->second->getNickname());
+				parse->Debug_msg(parse->getParameters()[0]);
 				if (it->second->getNickname() == parse->getParameters()[0] && it->second->isregisterd() == true)
 				{
 						client->SendServerToClient(": " ERR_NOSUCHNICK " "  

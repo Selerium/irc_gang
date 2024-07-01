@@ -178,16 +178,7 @@ void Channel::setLimiter(Client* client, int amount)
 int Channel::checkPermission(Client* client)
 {
 	std::map<Client *, int>::iterator it;
-	for(it = this->_clients.begin(); it != this->_clients.end(); it++)
-	{
-		if (it->first->getNickname() == client->getNickname())
-		{
-			if (it->second = 0)
-				return(0);
-			else if (it->second = 1)
-				return(1);
-			else if (it->second = 2)
-				return(2);
-		}
-	}
+
+	it = this->_clients.find(client);
+	return (it->second);
 }

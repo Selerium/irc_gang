@@ -33,6 +33,7 @@ void Client::SendServerToClient(std::string msg)
 
 bool Client::isregisterd()
 {
+	std::cout << getNickname() << " + " << getUsername() << std::endl;
 	if (getNickname() != "" && getUsername() != "")
 		return true;
 	return false;

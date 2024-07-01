@@ -8,14 +8,12 @@ void IRC::User::excuteUser(Parse *parse, Client* client, Server* server)
 {
 	(void)client;
 	(void)server;
-    (void)parse;
-	// server->clients_map[client->getClientFd()]->setUsername(parse->getParameters()[0]);
-	client->SendServerToClient("Username successfully changed\r\n");
+	(void)parse;
 
-	// if (isRegisterd(server, client_fd))
-	// 	client.SendServerToClient(ERROR_451, client_fd, "");
-
-
+	if (!client->getAuthantication())
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+	else
+		server->clients_map[client->getClientFd()]->setUsername(parse->getParameters()[0]);
 }
 
 // bool IRC::User::isRegisterd(Server* server, int client_fd)

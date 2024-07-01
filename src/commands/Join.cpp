@@ -1,5 +1,4 @@
 #include "../../include/IRC.hpp"
-#include "../../include/Channel.hpp"
 
 IRC::Join::Join(){}
 

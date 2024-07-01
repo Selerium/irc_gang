@@ -12,6 +12,7 @@
 #include <sstream>
 #include <vector>
 #include <arpa/inet.h>
+#include <cstdlib>
 
 #include "IRC.hpp"
 #include "Parse.hpp"

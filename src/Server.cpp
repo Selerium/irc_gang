@@ -47,15 +47,15 @@ void Server::socket_int()
 {
 	//create socket
 	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->socket_fd == -1) 
-        throw ErrorException("Error: Could not create socket");
+	if (this->socket_fd == -1)
+		throw ErrorException("Error: Could not create socket");
 
 	/* Set the SO_REUSEADDR option : to allow reusing local addresses.
 	This is useful, for example, when restarting a server program
 	 that needs to bind to the same port quickly after shutdown. */
 	int reuseaddr = 1;
-    if (setsockopt(socket_fd , SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)))
-        throw ErrorException("setsockopt faild");
+	if (setsockopt(socket_fd , SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)))
+		throw ErrorException("setsockopt faild");
 
 }
 
@@ -171,8 +171,15 @@ void Server::setPass(std::string pass) {this->_ServerPass = pass; }
 
 std::string Server::getServerPass() { return this->_ServerPass;}
 
+void Server::setFdSize(int size) {
+	this->fd_size = size;
+}
+
 ////////---------->>>>>>>> Getters <<<<<<<<<<--------------/////////
 
+int Server::getFdSize() const {
+	return this->fd_size;
+}
 
 
 void Server::printClients()
@@ -182,7 +189,7 @@ void Server::printClients()
 	for (it = this->clients_map.begin(); it != this->clients_map.end() ;++it)
 	{
 		if (it->first && it->second)
-			std::cout << it->first << std::endl; 
+			std::cout << it->second->getClientFd() << " " << it->second->getUsername() << std::endl; 
 	}
 }
 

@@ -25,7 +25,6 @@ class Server
 		std::map<int , Client *> clients_map;
 		struct pollfd *pfds;// an array of pollfd structures
 
-
 		Server(char **argv);
 		~Server();
 
@@ -40,8 +39,10 @@ class Server
 
 		void setPort(std::string port);
 		void setPass(std::string pass);
+		void setFdSize(int size);
 
 		std::string getServerPass();
+		int getFdSize() const;
 
 		/// functions for testing - check clients and fds  //
 		void printClients();

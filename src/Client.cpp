@@ -1,6 +1,6 @@
 #include "../include/Client.hpp"
 
-Client::Client(int fd, int isAuthanticated) : _Username(""), _Nickname(""), _hostName("") ,_ClientFd(fd) , _isAuthanticated(isAuthanticated)
+Client::Client(int fd, std::string hostname) : _Username(""), _Nickname(""), _hostName(hostname) ,_ClientFd(fd) , _isAuthanticated(false), _ServerToClient("")
 {
 }
 
@@ -14,3 +14,26 @@ std::string Client::getUsername() { return this->_Username;}
 std::string Client::getNickname() { return this->_Nickname;}
 
 std::string Client::getHostname() { return this->_hostName;}
+
+void Client::setAuthantication(bool flag) {this->_isAuthanticated = flag;}
+
+bool Client::getWelcomeMsg(){return this->_welcomMsgsent;}
+
+void Client::setWelcomeMsg(bool flag) {this->_welcomMsgsent = flag;}
+
+void Client::setNickname(std::string name) {this->_Nickname = name;}
+void Client::setUsername(std::string name) {this->_Username = name;}
+
+void Client::SendServerToClient(std::string msg)
+{
+	this->_ServerToClient += msg;
+
+}
+
+
+bool Client::isregisterd()
+{
+	if (getNickname() != "" && getUsername() != "")
+		return true;
+	return false;
+}

@@ -4,12 +4,11 @@ IRC::Quit::Quit(){}
 
 IRC::Quit::~Quit(){}
 
-void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server, int client_fd)
+void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server)
 {
 	(void)client;
 	(void)server;
-	(void)client_fd;
-	(void)parse;
+    (void)parse;
 
 	std::cout << "Clients BEFORE QUIT:" << std::endl;
 	server->printClients();

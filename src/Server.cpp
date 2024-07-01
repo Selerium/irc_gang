@@ -1,5 +1,7 @@
 #include "../include/Server.hpp"
 
+int signal_flag = 0;
+
 ////////---------->>>>>>>> Error handling exception <<<<<<<<<<--------------/////////
 
 const char* ErrorException::what() const throw() 
@@ -10,19 +12,32 @@ const char* ErrorException::what() const throw()
 ErrorException::ErrorException(const char *msg) : message(msg) {}
 
 
-
 ////////---------->>>>>>>> Server set up <<<<<<<<<<--------------/////////
 
 Server::Server(char **argv) : socket_fd(-1) , num_fd(1) , fd_size(10)  , port("6667")
 {
-	this->pfds = new struct pollfd[this->fd_size];
-	setPort(argv[1]);
-	setPass(argv[2]);
-	start_IRC();
+	try
+	{
+		signal(SIGINT,signalHandler);
+		signal_flag = 0;
+		this->pfds = new struct pollfd[this->fd_size];
+		setPort(argv[1]);
+		setPass(argv[2]);
+		start_IRC();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 }
 
 Server::~Server()
 {
+	std::cout << "Free all data" << std::endl;
+	if (this->result != NULL) {
+        freeaddrinfo(this->result);
+    }
 	delete[] this->pfds;
 }
 
@@ -46,17 +61,19 @@ void Server::GetaddrInfo()
 void Server::socket_int()
 {
 	//create socket
+	int reuseaddr = 1;
 	socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (this->socket_fd == -1)
-		throw ErrorException("Error: Could not create socket");
+    if (this->socket_fd == -1) {
+        throw ErrorException("Error: Could not create socket");}
 
 	/* Set the SO_REUSEADDR option : to allow reusing local addresses.
 	This is useful, for example, when restarting a server program
 	 that needs to bind to the same port quickly after shutdown. */
-	int reuseaddr = 1;
-	if (setsockopt(socket_fd , SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)))
-		throw ErrorException("setsockopt faild");
+    if (setsockopt(socket_fd , SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr))){
+        throw ErrorException("setsockopt faild");}
 
+	if (fcntl(socket_fd,F_SETFD ,O_NONBLOCK) == -1)
+        throw ErrorException("fcntl faild");
 }
 
 void Server::Bind_listen()
@@ -75,8 +92,10 @@ void Server::poll_fd()
 	/*The returned value indicates the total number of 
 	file descriptors for which events were reported.*/
 	this->num_poll = poll(this->pfds, this->num_fd, -1);
+
+	// chcking ? 
 	if (num_poll == -1)
-		throw ErrorException("poll faild");
+		throw ErrorException("");
 }
 
 void Server::add_new_client()
@@ -103,14 +122,15 @@ void Server::add_new_client()
 	pfds[num_fd].fd = this->client_sockfd;
 	pfds[num_fd].events = POLLIN | POLLOUT; //BOTH READ AND WRITE EAVENT EILL BE CHECKED
 	this->num_fd++;
+	clients_map[this->client_sockfd] = new Client(this->client_sockfd, inet_ntoa(client_addr.sin_addr));
 }
 
-void Server::read_message(int fd)
+
+void Server::read_message(int fd, Parse *parse)
 {
 	client_msg = "";
 	char buffer[1024];
 	ssize_t num_bytes = recv(pfds[fd].fd, buffer, sizeof(buffer), 0);
-	Parse parse;
 	if (num_bytes == 0)
 	{
 		// Connection closed by the client
@@ -119,24 +139,34 @@ void Server::read_message(int fd)
 		for (int j = fd; j < num_fd; ++j)
             pfds[j] = pfds[j + 1];
         num_fd--;
+		clients_map.erase(this->client_sockfd);
 	}
 	else
 	{
-		buffer[num_bytes] = '\0';
+		// buffer[num_bytes] = '\0';
 		client_msg += buffer;
 		memset(buffer, 0, sizeof(buffer));
-		parse.getCommandInfo(client_msg);
-		parse.printcommandinfo();
-		IRC::Commands().executeCommand(&parse,NULL, this, this->client_sockfd);
+		parse->getCommandInfo(client_msg, clients_map[this->client_sockfd]);
+		parse->printcommandinfo();
+		IRC::Commands().executeCommand(parse,clients_map[this->client_sockfd], this);
 	}
-	parse._messages.clear();
+	// printClients();
+	parse->_messages.clear();
 }
 
 ////////---------->>>>>>>> Start IRC server<<<<<<<<<<--------------/////////
 
 
+void Server::signalHandler(int signum) 
+{
+    std::cout << "\nInterrupt signal (" << signum << ") received." << std::endl;
+	signal_flag = 1;
+}
+
+
 void Server::start_IRC()
 {
+	Parse parse;
 	GetaddrInfo();
 	socket_int();
 	Bind_listen();
@@ -144,16 +174,27 @@ void Server::start_IRC()
 	pfds[0].events = POLLIN;
 	while(true)
 	{
+		if (signal_flag == 1)
+			throw ErrorException("");
 		poll_fd();
 		// Check for events on the server socket
 		if (pfds[0].revents & POLLIN)
 			add_new_client();
 		// Check for events on client sockets
-		for (int i = 0; i < this->num_fd; i++)
+		for (int i = 1; i < this->num_fd; i++)
 		{
+			this->client_sockfd = pfds[i].fd;
 			if (pfds[i].revents & POLLIN)
+			{
+				// parse.Debug_msg("test");
 				// Read data from the client
-				read_message(i);
+				// Parse parse;
+				read_message(i, &parse);
+			}
+			else if (pfds[i].revents & POLLOUT)
+			{
+				parse.sendToClient(clients_map[this->client_sockfd]);
+			}
 		}
 	}
 }
@@ -186,11 +227,15 @@ void Server::printClients()
 {
 	std::map<int , Client *>::iterator it;
 
-	for (it = this->clients_map.begin(); it != this->clients_map.end() ;++it)
+	if (!clients_map.empty())
 	{
-		if (it->first && it->second)
-			std::cout << it->second->getClientFd() << " " << it->second->getUsername() << std::endl; 
+		for (it = this->clients_map.begin(); it != this->clients_map.end() ;++it)
+		{
+			if (it->first && it->second)
+				std::cout << it->second->getClientFd() << " " << it->second->getUsername() << std::endl; 
+		}
 	}
+
 }
 
 

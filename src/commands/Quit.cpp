@@ -1,4 +1,5 @@
 #include "../../include/IRC.hpp"
+#include <map>
 
 IRC::Quit::Quit(){}
 
@@ -6,7 +7,14 @@ IRC::Quit::~Quit(){}
 
 void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server)
 {
-	(void)parse;
+	std::string quit_msg;
+	std::vector<std::string> sample = parse->getParameters();
+
+	for (std::vector<std::string>::iterator it = sample.begin(); it != sample.end(); it++) {
+		quit_msg.append(it->c_str());
+		quit_msg.append(" ");
+	}
+	parse->Debug_msg(quit_msg);
 
 	std::cout << "Clients BEFORE QUIT:" << std::endl;
 	server->printClients();
@@ -30,14 +38,17 @@ void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server)
 		}
 	}
 
+	//server sends QUIT :<reason> to clients that share a channel with the user
+	//<reason> can be empty
+	if (!server->channel_map.empty()) {
+		for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
+			if (it->second->FindClient(client->getNickname()))
+				it->second->sendToall(client->getNickname() + "!" + client->getUsername() + "@localhost QUIT :" + quit_msg);
+		}
+	}
+
 	//remove client from clients_map
 	server->clients_map.erase(client->getClientFd());
-
-	// //server sends QUIT :<reason> to clients that share a channel with the user
-	// //<reason> can be empty
-
-	// //if client closes connection without QUIT, server must still send QUIT :<reason> to others
-	// //<reason> = {"Ping timeout", "Disconnected", "Excess Flood"} etc.
 
 	std::cout << "Clients AFTER QUIT:" << std::endl;
 	server->printClients();

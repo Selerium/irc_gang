@@ -215,7 +215,9 @@ void Server::start_IRC()
 void Server::setPort(std::string port)
 {
 	if (std::strtol(port.c_str(), NULL, 10) >= 0 && std::strtol(port.c_str(), NULL, 10) <= 1023)
-		throw ErrorException("port num is within resevrd range(0 - 1023)");
+		throw ErrorException("Port num is within reserved range (0 - 1023)");
+	else if (std::strtol(port.c_str(), NULL, 10) > 65535)
+		throw ErrorException("Port num exceeds allowed range (> 65535)");
 	this->port = port;
 }
 

@@ -50,7 +50,7 @@ class Channel
 		
 		Client* FindClient(std::string clientNick);
 		void sendToall(std::string msg);
-		void removeNick(Client* client, std::string nick);
+		void removNick(Client* client, std::string nick);
 		int checkPermission(Client* client);
 
 //MODESTUFF

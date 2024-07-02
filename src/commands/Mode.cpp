@@ -21,8 +21,21 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 		{
 			if (parameter.size() == 1)
 			{
-				//print modes
-				return;
+				client->SendServerToClient(it->second->getChannelName() + "\r\n");
+				
+				if (it->second->getsetLimit() == true)
+					client->SendServerToClient("User limit : TRUE : " + it->second->getLimit() + "\r\n");
+				else
+					client->SendServerToClient("User limit : FALSE\r\n");
+				
+				if (it->second->getChannelMode() == true)
+					client->SendServerToClient("Channel pass : TRUE : " + it->second->getChannelPassword() + "\r\n");
+				else
+					client->SendServerToClient("Channel pass : FALSE\r\n");
+
+				client->SendServerToClient("Channel privilage : " + it->second->getChannelMode() + "\r\n");
+
+				client->SendServerToClient("Channel Topic : " + it->second->getTopicMode() + " : " + it->second->getTopic() + "\r\n");
 			}
 			if (parameter[1] == "+L" || parameter[1] == "+l")
 			{

@@ -46,17 +46,13 @@ void Channel::addChanneluser(Client* client)
 		this->_clients.insert(std::make_pair(client, 1));
 		this->_clientAmount++;
 	}
-	else if (getsetLimit() == true)
+	else if (getsetLimit() == true && _clientAmount >= getLimit())
 	{
-
+		client->SendServerToClient("Already reached limit of users in channel");
+		return;
 	}
 	else if (getChannelMode() == true)
 	{
-		if (_clientAmount >= getLimit())
-		{
-			client->SendServerToClient("Already reached limit of users in channel");
-			return;
-		}
 		std::map<Client *, int>::iterator it;
 		it = this->_clients.find(client);
 		if (it->first->getNickname() == client->getNickname() && it->second == 2)

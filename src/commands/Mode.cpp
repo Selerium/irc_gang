@@ -164,7 +164,7 @@ void Channel::Permissions(Client* admin, Client* client, bool perm)
 void Channel::SetTopicMode(Client* client, bool mode)
 {
 	if (checkPermission(client) == 1)
-		this->_topicMode == mode;
+		this->_topicMode = mode;
 	else
 		client->SendServerToClient(": No permissions to change mode");
 }

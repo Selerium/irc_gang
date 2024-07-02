@@ -81,9 +81,9 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 						return;
 					}
 					else if (topic ==  " ")
-						it->second->setTopic("");
+						it->second->setTopic(client, "");
 					else
-						it->second->setTopic(topic);
+						it->second->setTopic(client, topic);
 					it->second->sendToall( client->getNickname() + " changed the topic of " + setChannel + " to :" +  it->second->getTopic() + "\r\n");
 				}
 				else 

@@ -13,6 +13,7 @@ class Client
 	std::string _Username;
 	std::string _Nickname;
 	std::string _hostName;
+	std::string _RealName;
 	int _ClientFd;
 	bool _welcomMsgsent;
 	//bool _registerd;
@@ -23,6 +24,7 @@ class Client
 	public:
 		std::string _ClientToServer;
 		std::string _ServerToClient;
+		bool UserSet;
 
 		Client(int fd, std::string hostname);
 		int getClientFd();
@@ -30,11 +32,13 @@ class Client
 		std::string getUsername();
 		std::string getNickname();
 		std::string getHostname();
+		std::string getRealname();
+
 		bool getWelcomeMsg();
 		void setAuthantication(bool flag);
 		void setNickname(std::string name);
 		void setUsername(std::string name);
-
+		void setRealname(std::string name);
 		void SendServerToClient(std::string msg);
 
 		void setWelcomeMsg(bool flag);

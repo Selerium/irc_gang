@@ -23,11 +23,13 @@ bool Channel::getsetLimit(){return this->_setLimit;}
 void Channel::setTopic(Client* client, std::string str)
 {
 	if (getTopicMode() == true)
+	{
 		if (checkPermission(client))
 		{
 			this->_Topic = str;
 			setwhosetTopic(client->getNickname());
 		}
+	}
 	else
 		this->_Topic = str;
 }

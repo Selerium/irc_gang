@@ -20,12 +20,19 @@ IRC::Commands::Commands(){
 
 IRC::Commands::~Commands(){}
 
+std::string toUpperCase(const std::string& str) 
+{
+        std::string upperCaseStr = str;
+        std::transform(upperCaseStr.begin(), upperCaseStr.end(), upperCaseStr.begin(), ::toupper);
+        return upperCaseStr;
+}
+
 void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server) 
 {
 	while (!parse->_messages.empty())
 	{
 
-		std::map<std::string, CommandFunction>::iterator it = commandMap.find(parse->getCommand());
+		std::map<std::string, CommandFunction>::iterator it = commandMap.find(toUpperCase(parse->getCommand()));
 		if (it != commandMap.end())
 		{
 			(this->*(it->second))(parse,client, server);
@@ -121,5 +128,8 @@ void IRC::Commands::WelcomeMsg(Client* client)
 								+ "!"
 								+ client->getUsername()
 								+ "\r\n";
-	client->SendServerToClient(welcomeMsg);					
+	client->SendServerToClient(welcomeMsg);
+	client->SendServerToClient(":irc 002 " + client->getNickname() + " :Your host is irc, running version 1.3");
+	client->SendServerToClient(":irc 003 " + client->getNickname() + " :This server was created july->2024");
+	client->SendServerToClient(":irc 004 " + client->getNickname() + " irc 1.3  itklo");				
 }

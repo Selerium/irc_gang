@@ -15,12 +15,16 @@
 #include <fcntl.h>
 #include <csignal> 
 #include <cstdlib>
+#include <cctype>
 
 #include "IRC.hpp"
 #include "Parse.hpp"
 #include "Client.hpp"
 #include "Server.hpp"
 #include "ErrorMsg.hpp"
+
+#define USERLEN 12
+
 
 class Server;
 class Client;
@@ -111,9 +115,10 @@ public:
 
         public:
             User();
-            ~User();        
+            ~User();
+            std::string realname;  
            void excuteUser(Parse *parse, Client* client, Server* server);
-            bool isRegisterd(Server* server);
+           int parseMsg(Parse *parse, Client* client);
     };
     class Whois 
     {

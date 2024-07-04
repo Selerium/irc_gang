@@ -4,6 +4,19 @@ IRC::Mode::Mode(){}
 
 IRC::Mode::~Mode(){}
 
+std::string print_num(int num) {
+	std::string result;
+	char c;
+
+	while (num) {
+		c = (num % 10) - '0';
+		result.insert(result.end(), c);
+		num /= 10;
+	}
+	std::cout << result << std::endl;
+	return result;
+}
+
 void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 {
 	std::vector<std::string> parameter = parse->getParameters();
@@ -24,7 +37,7 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 				client->SendServerToClient(it->second->getChannelName() + "\r\n");
 				
 				if (it->second->getsetLimit() == true)
-					client->SendServerToClient("User limit : TRUE : " + it->second->getLimit() + "\r\n");
+					client->SendServerToClient("User limit : TRUE : " + print_num(it->second->getLimit()) + "\r\n");
 				else
 					client->SendServerToClient("User limit : FALSE\r\n");
 				
@@ -33,9 +46,9 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 				else
 					client->SendServerToClient("Channel pass : FALSE\r\n");
 
-				client->SendServerToClient("Channel privilage : " + it->second->getChannelMode() + "\r\n");
+				client->SendServerToClient("Channel privilage : " + print_num(it->second->getChannelMode()) + "\r\n");
 
-				client->SendServerToClient("Channel Topic : " + it->second->getTopicMode() + " : " + it->second->getTopic() + "\r\n");
+				client->SendServerToClient("Channel Topic : " + print_num(it->second->getTopicMode()) + " : " + it->second->getTopic() + "\r\n");
 			}
 			if (parameter[1] == "+L" || parameter[1] == "+l")
 			{

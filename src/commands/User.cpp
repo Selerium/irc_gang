@@ -10,8 +10,10 @@ void IRC::User::excuteUser(Parse *parse, Client* client, Server* server)
 
 	if (!client->getAuthantication())
 		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
-	else
+	else {
 		server->clients_map[client->getClientFd()]->setUsername(parse->getParameters()[0]);
+		client->SendServerToClient(" : Username added\r\n");
+	}
 }
 
 // bool IRC::User::isRegisterd(Server* server, int client_fd)

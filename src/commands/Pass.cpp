@@ -32,7 +32,7 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 		return;
 	}
 	server->clients_map[client->getClientFd()]->setAuthantication(true);
-		
+	client->SendServerToClient(" : Success! User authenticated.\r\n");
 }
 
 void IRC::Pass::setClientPass(std::string pass) {this->_clientPass = pass;}

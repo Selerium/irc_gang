@@ -27,25 +27,26 @@ int IRC::Topic::parseMsg(Parse *parse, Client* client)
 
 	setChannel = parameters[0];
 	bool textFound = false;
-    std::vector<std::string>::iterator it;
-    for (it = parameters.begin() + 1; it != parameters.end(); ++it)
-    {
-        if (!it->empty())
-        {
-            if ((*it)[0] == ':' && !textFound)
-            {
-                *it = it->substr(1);
-                textFound = true;
-            }
-            else if ((*it)[0] != ':' && !textFound)
+	std::vector<std::string>::iterator it;
+	for (it = parameters.begin() + 1; it != parameters.end(); ++it)
+	{
+		parse->Debug_msg(*it);
+		if (!it->empty())
+		{
+			if (!textFound && (*it)[0] == ':')
+			{
+				*it = it->substr(1);
+				textFound = true;
+			}
+			else if (!textFound && (*it)[0] != ':')
 			{
 				client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
 				+ " TOPIC " ":Not enough parameters");
-                return 1;
+				return 1;
 			}
-            topic += (*it + " ");
-        }
-    }
+			topic += (*it + " ");
+		}
+	}
 	return 0;
 }
 
@@ -56,12 +57,12 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 		std::map<int, Channel *>::iterator it;
 		for (it = server->channel_map.begin(); it !=server->channel_map.end(); ++it)
 		{
-			if (it->second->getChannelName() == setChannel )
+			if (it->second->getChannelName() == setChannel)
 			{
 				if (it->second->FindClient(client->getNickname()) != NULL)
 				{
 					// add condition depending on Topic permissions:
-					if (it->second->_clients.find(client)->second == 0)
+					if (it->second->getTopicMode() && it->second->_clients.find(client)->second == 0)
 					{
 						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED " " + client->getNickname() + " " + setChannel
 							+ " :You're not channel operator");
@@ -69,15 +70,17 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 					}
 					if (topic == "")
 					{
-						if (it->second->getTopic() == "")
+						if (it->second->getTopic() == "") {
 							client->SendServerToClient(": " RPL_NOTOPIC " " + client->getNickname() + " " + setChannel
 							+ " :No topic is set");
+							return ;
+						}
 						else 
 							it->second->setwhosetTopic(client->getNickname());
 						client->SendServerToClient(": " RPL_TOPIC " " + client->getNickname() 
-							+ " " + setChannel + ":" + it->second->getTopic());
+							+ " " + setChannel + " :" + it->second->getTopic());
 						client->SendServerToClient(": " RPL_TOPICWHOTIME " " + client->getNickname() 
-						+ " " + setChannel + " " + it->second->getwhosetTopic());
+						+ " " + setChannel + " :" + it->second->getwhosetTopic());
 						return;
 					}
 					else if (topic ==  " ")
@@ -85,10 +88,12 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 					else
 						it->second->setTopic(client, topic);
 					it->second->sendToall( client->getNickname() + " changed the topic of " + setChannel + " to :" +  it->second->getTopic());
+					return ;
 				}
-				else 
-					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + " "
-					+ setChannel + " :You're not on that channel");
+				else {
+					client->SendServerToClient(client->getNickname() + " " + setChannel + " :442 You're not on that channel");
+					return ;
+				}
 			}
 		}
 	}

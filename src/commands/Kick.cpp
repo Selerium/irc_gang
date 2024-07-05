@@ -71,13 +71,11 @@ void IRC::Kick::checkChannel(Client* client, Server* server)
 							it->second->removeNick(it->second->FindClient(setkickNick), setkickNick);
 						}
 						else
-							client->SendServerToClient(": " ERR_USERNOTINCHANNEL " " + client->getNickname() + " " + setkickNick + " " + setChannel
-							+ " :They aren't on that channel");
+							client->SendServerToClient(client->getNickname() + " " + setkickNick + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
 					}
 				}
 				else 
-					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + " "
-					+ setChannel + " :You're not on that channel");
+					client->SendServerToClient(client->getNickname() + " " + setChannel + " :442 You're not on that channel");
 				return;
 			}
 		}

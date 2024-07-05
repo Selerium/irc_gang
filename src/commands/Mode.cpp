@@ -36,6 +36,10 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 	{
 		if (it->second->getChannelName() == channelname)
 		{
+			if (!it->second->FindClient(client->getNickname())) {
+				client->SendServerToClient(client->getNickname() + " " + channelname + " :442 You're not on that channel");
+				return ;
+			}
 			if (parameter.size() == 1)
 			{
 				client->SendServerToClient("Channel name :" + it->second->getChannelName() + "");
@@ -60,6 +64,10 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					client->SendServerToClient("Channel privilage : NON");
 
 				client->SendServerToClient("Channel Topic : " + print_num(it->second->getTopicMode()) + " : " + it->second->getTopic() + "");
+				return ;
+			}
+			if (!it->second->FindClient(parameter[2])) {
+				client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
 			}
 			if (parameter[1] == "+L" || parameter[1] == "+l")
 			{
@@ -69,52 +77,53 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					it->second->setLimiter(client, num);
 				}
 			}
-			if (parameter[1] == "-L" || parameter[1] == "-l")
+			else if (parameter[1] == "-L" || parameter[1] == "-l")
 				it->second->removeLimit(client);
-			if (parameter[1] == "+K" || parameter[1] == "+k")
+			else if (parameter[1] == "+K" || parameter[1] == "+k")
 			{
 				it->second->setPass(client, parameter[2]);
 			}
-			if (parameter[1] == "-K" || parameter[1] == "-k")
+			else if (parameter[1] == "-K" || parameter[1] == "-k")
 				it->second->removePass(client);
-			if (parameter[1] == "+I" || parameter[1] == "+i")
+			else if (parameter[1] == "+I" || parameter[1] == "+i")
 			{
 				if (parameter.size() == 2)
 					it->second->setChannelMode(client, true);
 			}
-			if (parameter[1] == "-I" || parameter[1] == "-i")
+			else if (parameter[1] == "-I" || parameter[1] == "-i")
 			{
 				if (parameter.size() == 2)
 					it->second->setChannelMode(client, false);
 			}
-			if (parameter[1] == "+O" || parameter[1] == "+o")
+			else if (parameter[1] == "+O" || parameter[1] == "+o")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
 			}
-			if (parameter[1] == "-O" || parameter[1] == "-o")
+			else if (parameter[1] == "-O" || parameter[1] == "-o")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), false);
 			}
-			if (parameter[1] == "+T" || parameter[1] == "+t")
+			else if (parameter[1] == "+T" || parameter[1] == "+t")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
 			}
-			if (parameter[1] == "-T" || parameter[1] == "-t")
+			else if (parameter[1] == "-T" || parameter[1] == "-t")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), false);
+			}
+			else {
+				client->SendServerToClient(client->getNickname() + " " + parameter[1] + " :is unknown mode char to me");
+				return ;
 			}
 		}
 	}
-	if (it == server->channel_map.end() && it->second->getChannelName() != channelname)
-		client->SendServerToClient("server doesnt exist");
-	(void)client;
-	(void)server;
-    (void)parse;
-
+	if (it == server->channel_map.end())
+		client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
+	(void)parse;
 }
 
 // · l: Set/remove the user limit to channel

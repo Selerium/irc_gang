@@ -38,7 +38,7 @@ class Channel
 		int			getLimit();
 		bool		getsetLimit();
 		bool		getTopicMode();
-
+		bool		getInviteMode();
 
 		void setTopic(Client* client, std::string str);
 		void setwhosetTopic(std::string str);

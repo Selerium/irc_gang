@@ -22,17 +22,17 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 
 	if (ClientisAuthanticated(client))
 	{
-		client->SendServerToClient(": " ERROR_462 " " + client->getNickname() + " :You may not reregister");
+		client->SendServerToClient(client->getNickname() + " :" ERROR_462 + " You may not reregister");
 		return;
 	}
 
 	if (checkClientPass(server))
 	{
-		client->SendServerToClient(": " ERROR_464 " :Password incorrect");
+		client->SendServerToClient(": " ERROR_464 "Password incorrect");
 		return;
 	}
 	server->clients_map[client->getClientFd()]->setAuthantication(true);
-	client->SendServerToClient(" : Success! User authenticated.");
+	client->SendServerToClient(client->getNickname() + " : Success! User authenticated.");
 }
 
 void IRC::Pass::setClientPass(std::string pass) {this->_clientPass = pass;}

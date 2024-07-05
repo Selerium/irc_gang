@@ -6,6 +6,7 @@ Channel::Channel(std::string name, std::string pass) : _Name(name), _Password(pa
 	this->_inviteOnly = false;
 	this->_setLimit = true;
 	this->_limit = 10;
+	this->_topicMode = false;
 }
 
 std::string Channel::getChannelName() {return this->_Name;}
@@ -21,6 +22,8 @@ std::string Channel::getwhosetTopic(){return this->_whosetTopic;}
 int Channel::getLimit(){return this->_limit;}
 
 bool Channel::getsetLimit(){return this->_setLimit;}
+
+bool Channel::getInviteMode() { return this->_inviteOnly; }
 
 void Channel::setTopic(Client* client, std::string str)
 {
@@ -79,12 +82,12 @@ void Channel::inviteChanneluser(Client* admin, Client* client)
 {
 	if (checkPermission(admin) != 1)
 	{
-		client->SendServerToClient(": No permissions to invite to channel");
+		admin->SendServerToClient(admin->getNickname() + " " + client->getNickname() + " :400 No permissions to invite to channel");
 		return;
 	}
 	else if (FindClient(client->getNickname()) != NULL)
 	{
-		client->SendServerToClient(": User is already in channel");
+		admin->SendServerToClient(admin->getNickname() + " " + client->getNickname() + " :443 User is already in channel");
 		return;
 	}
 	this->_clients.insert(std::make_pair(client, 2));

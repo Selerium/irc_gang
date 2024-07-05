@@ -15,7 +15,7 @@ void IRC::User::excuteUser(Parse *parse, Client* client, Server* server)
 		if (client->UserSet == false)
 			parseMsg(parse, client);
 		else
-			client->SendServerToClient(": " ERROR_462 " " + client->getNickname() + " :You may not reregister");
+			client->SendServerToClient(client->getNickname() + " :" ERROR_462 " You may not reregister");
 	}
 }
 
@@ -28,8 +28,7 @@ int IRC::User::parseMsg(Parse *parse, Client* client)
 		|| parameters[1][0] == ':'
 		|| parameters[2][0] == ':')
 	{
-		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-		+ " USER :Not enough parameters");
+		client->SendServerToClient(":" ERR_NEEDMOREPARAMS " Not enough parameters");
 		return 1;
 	}
 

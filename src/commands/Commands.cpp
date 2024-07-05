@@ -47,7 +47,7 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 		else 
 		{
 			//unknown command
-			client->SendServerToClient(": 421 "  ERROR_421  " " + parse->getCommand());
+			client->SendServerToClient(": 421 " + parse->getCommand() + ERROR_421);
 		}
 		parse->_messages.erase(parse->_messages.begin());
 	}
@@ -121,8 +121,8 @@ void IRC::Commands::invite(Parse *parse, Client* client, Server* server)
 
 void IRC::Commands::WelcomeMsg(Client* client)
 {
-	std::string welcomeMsg = ":" 
-								"" RPL_WELCOME " "
+	std::string welcomeMsg = ":irc " 
+								RPL_WELCOME " "
 								+ client->getNickname()
 								+ " :Welcome to the Internet Relay Network, "
 								+ client->getNickname()
@@ -131,5 +131,5 @@ void IRC::Commands::WelcomeMsg(Client* client)
 	client->SendServerToClient(welcomeMsg);
 	client->SendServerToClient(":irc 002 " + client->getNickname() + " :Your host is irc, running version 1.3");
 	client->SendServerToClient(":irc 003 " + client->getNickname() + " :This server was created july->2024");
-	client->SendServerToClient(":irc 004 " + client->getNickname() + " irc 1.3  itklo");
+	client->SendServerToClient(":irc 004 " + client->getNickname() + " :irc 1.3  itklo");
 }

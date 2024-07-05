@@ -52,6 +52,18 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 	{
 		if (it->second->getChannelName() == channelname)
 		{
+			if (it->second->getsetLimit() && it->second->_clientAmount == it->second->getLimit()) {
+				client->SendServerToClient(client->getNickname() + " " + channelname + " :Cannot join channel (+l)");
+				return ;
+			}
+			if (it->second->getInviteMode() && (!it->second->_clients.find(client)->first || it->second->checkPermission(client) != 2)) {
+				client->SendServerToClient(client->getNickname() + " " + channelname + " :Cannot join channel (+i)");
+				return ;
+			}
+			if (it->second->getChannelPassword().length() && it->second->getChannelPassword() != pass) {
+				client->SendServerToClient(client->getNickname() + " " + channelname + " :Cannot join channel (+k)");
+				return ;
+			}
 			it->second->addChanneluser(client);
 		}
 	}

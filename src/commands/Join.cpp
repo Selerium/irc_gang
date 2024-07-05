@@ -13,6 +13,10 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
 		return ;
 	}
+	if (parse->getParameters().empty()) {
+		client->SendServerToClient("Parse error\r\n");
+		return ;
+	}
 
 	if (parameter.size() == 0)
 		client->SendServerToClient("Parse error\r\n");

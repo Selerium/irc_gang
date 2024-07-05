@@ -1,4 +1,5 @@
 #include "../../include/IRC.hpp"
+#include<algorithm>
 
 
 IRC::Commands::Commands(){

@@ -1,8 +1,9 @@
 #include "../include/Client.hpp"
 
-Client::Client(int fd, std::string hostname) : _Username(""), _Nickname(""), _hostName(hostname) , _RealName("") ,_ClientFd(fd) , _isAuthanticated(false), _ServerToClient("")
+Client::Client(int fd, std::string hostname) : _Username(""), _Nickname(""), _hostName(hostname), _RealName(""), _ClientFd(fd),
+	_welcomMsgsent(false), _isAuthanticated(false), _ClientToServer(""), _ServerToClient(""), UserSet(false)
 {
-	UserSet = false;
+
 }
 
 int Client::getClientFd() {return this->_ClientFd; }

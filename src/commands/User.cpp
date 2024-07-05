@@ -22,10 +22,14 @@ void IRC::User::excuteUser(Parse *parse, Client* client, Server* server)
 int IRC::User::parseMsg(Parse *parse, Client* client)
 {
 	std::vector<std::string> parameters = parse->getParameters();
-	if (parameters.empty() || parameters[0][0] == ':'|| parameters[1][0] == ':' || parameters[2][0] == ':' || parameters.size() < 4)
+	if (parameters.empty()
+		|| parameters.size() < 4
+		|| parameters[0][0] == ':'
+		|| parameters[1][0] == ':'
+		|| parameters[2][0] == ':')
 	{
 		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-		+ " USER " ":Not enough parameters\r\n");
+		+ " USER :Not enough parameters\r\n");
 		return 1;
 	}
 
@@ -34,26 +38,26 @@ int IRC::User::parseMsg(Parse *parse, Client* client)
 	else 
 		client->setUsername(parameters[0]);
 
-    std::vector<std::string>::iterator it;
-	bool textFound;
-    for (it = parameters.begin() + 3; it != parameters.end(); ++it)
-    {
-        if (!it->empty())
-        {
-            if ((*it)[0] == ':' && !textFound)
-            {
-                *it = it->substr(1);
-                textFound = true;
-            }
-            else if ((*it)[0] != ':' && !textFound)
+	std::vector<std::string>::iterator it;
+	bool textFound = false;
+	for (it = parameters.begin() + 3; it != parameters.end(); ++it)
+	{
+		if (!it->empty())
+		{
+			if ((*it)[0] == ':' && !textFound)
+			{
+				*it = it->substr(1);
+				textFound = true;
+			}
+			else if ((*it)[0] != ':' && !textFound)
 			{
 				client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
 				+ " USER " ":Not enough parameters\r\n");
-                return 1;
+				return 1;
 			}
-            realname += (*it + " ");
-        }
-    }
+			realname += (*it + " ");
+		}
+	}
 	client->setRealname(realname);
 	client->UserSet = true;
 	return 0;

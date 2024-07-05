@@ -24,7 +24,7 @@ FILES = src/main.cpp \
 
 
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
 CXX = c++
 

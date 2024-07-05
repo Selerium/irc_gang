@@ -21,6 +21,11 @@ Server::Server(char **argv) : socket_fd(-1) , num_fd(1) , fd_size(10)  , port("6
 		signal(SIGINT,signalHandler);
 		signal_flag = 0;
 		this->pfds = new struct pollfd[this->fd_size];
+		for (int i = 0; i < this->fd_size; i++) {
+			this->pfds[i].events = 0;
+			this->pfds[i].revents = 0;
+			this->pfds[i].fd = 0;
+		}
 		setPort(argv[1]);
 		setPass(argv[2]);
 		start_IRC();
@@ -195,7 +200,7 @@ void Server::start_IRC()
 		for (int i = 1; i < this->num_fd; i++)
 		{
 			this->client_sockfd = pfds[i].fd;
-			if (pfds[i].revents & POLLIN)
+			if (pfds[i].revents && pfds[i].revents & POLLIN)
 			{
 				// parse.Debug_msg("test");
 				// Read data from the client

@@ -4,6 +4,8 @@ Channel::Channel(std::string name, std::string pass) : _Name(name), _Password(pa
 {
 	this->_clientAmount = 0;
 	this->_inviteOnly = false;
+	this->_setLimit = true;
+	this->_limit = 10;
 }
 
 std::string Channel::getChannelName() {return this->_Name;}
@@ -63,7 +65,7 @@ void Channel::addChanneluser(Client* client)
 	{
 		std::map<Client *, int>::iterator it;
 		it = this->_clients.find(client);
-		if (it->first->getNickname() == client->getNickname())
+		if (it != this->_clients.end() && it->first->getNickname() == client->getNickname())
 		{
 			client->SendServerToClient("Already in server");
 			return;

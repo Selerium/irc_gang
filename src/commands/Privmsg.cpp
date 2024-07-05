@@ -77,7 +77,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
 				{
 					if (it->second->_clients.find(client)->second == 1)
-						it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
+						it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n");
 				}
 				return;
 			}
@@ -92,7 +92,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			{
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
-					it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
+					it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n");
 			return;
 			}
 		}
@@ -112,7 +112,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			{
 				if (it->second->getNickname() == getReceiver())
 				{
-					server->clients_map[it->first]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
+					server->clients_map[it->first]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n"); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
 					return;
 				}
 			}
@@ -126,7 +126,7 @@ void IRC::Privmsg::sendToAll(Server* server)
 {
 	std::map<int , Client *>::iterator it;
 	for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
-			server->clients_map[it->second->getClientFd()]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
+			server->clients_map[it->second->getClientFd()]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n");
 }
 
 void IRC::Privmsg::setReceiver(std::string str){ this->_receiver = str;}

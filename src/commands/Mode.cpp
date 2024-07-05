@@ -49,8 +49,15 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					client->SendServerToClient("Channel pass : TRUE : " + it->second->getChannelPassword() + "");
 				else
 					client->SendServerToClient("Channel pass : FALSE");
-
-				client->SendServerToClient("Channel privilage : " + print_num(it->second->getChannelMode()) + "");
+				
+				if (it->second->checkPermission(client) == 0)
+					client->SendServerToClient("Channel privilage : User");
+				else if (it->second->checkPermission(client) == 1)
+					client->SendServerToClient("Channel privilage : Operator");
+				else if (it->second->checkPermission(client) == 2)
+					client->SendServerToClient("Channel privilage : Invited");
+				else
+					client->SendServerToClient("Channel privilage : NON");
 
 				client->SendServerToClient("Channel Topic : " + print_num(it->second->getTopicMode()) + " : " + it->second->getTopic() + "");
 			}
@@ -102,7 +109,7 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 			}
 		}
 	}
-	if (it == server->channel_map.end())
+	if (it == server->channel_map.end() && it->second->getChannelName() != channelname)
 		client->SendServerToClient("server doesnt exist");
 	(void)client;
 	(void)server;

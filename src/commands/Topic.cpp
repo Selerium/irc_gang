@@ -8,7 +8,7 @@ IRC::Topic::~Topic(){}
 void IRC::Topic::excuteTopic(Parse *parse, Client* client, Server* server)
 {
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 
@@ -21,7 +21,7 @@ int IRC::Topic::parseMsg(Parse *parse, Client* client)
 	if (parameters.empty() || parameters[0][0] == ':')
 	{
 		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-		+ " TOPIC " ":Not enough parameters\r\n");
+		+ " TOPIC " ":Not enough parameters");
 		return 1;
 	}
 
@@ -40,7 +40,7 @@ int IRC::Topic::parseMsg(Parse *parse, Client* client)
             else if ((*it)[0] != ':' && !textFound)
 			{
 				client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-				+ " TOPIC " ":Not enough parameters\r\n");
+				+ " TOPIC " ":Not enough parameters");
                 return 1;
 			}
             topic += (*it + " ");
@@ -64,36 +64,36 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 					if (it->second->_clients.find(client)->second == 0)
 					{
 						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED " " + client->getNickname() + " " + setChannel
-							+ " :You're not channel operator\r\n");
+							+ " :You're not channel operator");
 						return;
 					}
 					if (topic == "")
 					{
 						if (it->second->getTopic() == "")
 							client->SendServerToClient(": " RPL_NOTOPIC " " + client->getNickname() + " " + setChannel
-							+ " :No topic is set\r\n");
+							+ " :No topic is set");
 						else 
 							it->second->setwhosetTopic(client->getNickname());
 						client->SendServerToClient(": " RPL_TOPIC " " + client->getNickname() 
-							+ " " + setChannel + ":" + it->second->getTopic() + "\r\n");
+							+ " " + setChannel + ":" + it->second->getTopic());
 						client->SendServerToClient(": " RPL_TOPICWHOTIME " " + client->getNickname() 
-						+ " " + setChannel + " " + it->second->getwhosetTopic() +  "\r\n");
+						+ " " + setChannel + " " + it->second->getwhosetTopic());
 						return;
 					}
 					else if (topic ==  " ")
 						it->second->setTopic(client, "");
 					else
 						it->second->setTopic(client, topic);
-					it->second->sendToall( client->getNickname() + " changed the topic of " + setChannel + " to :" +  it->second->getTopic() + "\r\n");
+					it->second->sendToall( client->getNickname() + " changed the topic of " + setChannel + " to :" +  it->second->getTopic());
 				}
 				else 
 					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + " "
-					+ setChannel + " :You're not on that channel\r\n");
+					+ setChannel + " :You're not on that channel");
 			}
 		}
 	}
 	client->SendServerToClient(": " ERR_NOSUCHCHANNEL " " + client->getNickname() + " " 
-	+ setChannel + " :No such channel\r\n");
+	+ setChannel + " :No such channel");
 	return;
 }
 /*

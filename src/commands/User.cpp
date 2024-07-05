@@ -9,13 +9,13 @@ void IRC::User::excuteUser(Parse *parse, Client* client, Server* server)
 	(void)server;
 
 	if (!client->getAuthantication())
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 	else
 	{
 		if (client->UserSet == false)
 			parseMsg(parse, client);
 		else
-			client->SendServerToClient(": " ERROR_462 " " + client->getNickname() + " :You may not reregister\r\n");
+			client->SendServerToClient(": " ERROR_462 " " + client->getNickname() + " :You may not reregister");
 	}
 }
 
@@ -29,7 +29,7 @@ int IRC::User::parseMsg(Parse *parse, Client* client)
 		|| parameters[2][0] == ':')
 	{
 		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-		+ " USER :Not enough parameters\r\n");
+		+ " USER :Not enough parameters");
 		return 1;
 	}
 
@@ -52,7 +52,7 @@ int IRC::User::parseMsg(Parse *parse, Client* client)
 			else if ((*it)[0] != ':' && !textFound)
 			{
 				client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-				+ " USER " ":Not enough parameters\r\n");
+				+ " USER " ":Not enough parameters");
 				return 1;
 			}
 			realname += (*it + " ");

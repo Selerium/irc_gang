@@ -7,7 +7,7 @@ IRC::Invite::~Invite(){}
 void IRC::Invite::excuteInvite(Parse *parse, Client* client, Server* server)
 {
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 
@@ -22,7 +22,7 @@ int IRC::Invite::parseMsg(Parse *parse, Client* client)
 	if (parameters.empty() || parameters.size() < 2)
 	{
 		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-		+ " INVITE " ":Not enough parameters\r\n");
+		+ " INVITE " ":Not enough parameters");
 		return 1;
 	}
 	setChannel = parameters[0];
@@ -45,28 +45,28 @@ void IRC::Invite::checkChannel(Client* client, Server* server)
 					if (it->second->_clients.find(client)->second == 0)
 					{
 						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED " " + client->getNickname() + " " + setChannel
-							+ " :You're not channel operator\r\n");
+							+ " :You're not channel operator");
 						return;
 					}
 					else
 					{
 						if (it->second->FindClient(setInviteNick) != NULL)
 							client->SendServerToClient(": " ERR_USERONCHANNEL " " + client->getNickname() + " "
-							+ setInviteNick + " :is already on channel\r\n");
+							+ setInviteNick + " :is already on channel");
 						else
 							client->SendServerToClient(client->getNickname() + " INVITE "
-							+ setInviteNick +  " " + setChannel +"\r\n");
+							+ setInviteNick +  " " + setChannel +"");
 					}
 				}
 				else 
 					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + " "
-					+ setChannel + " :You're not on that channel\r\n");
+					+ setChannel + " :You're not on that channel");
 				return;
 			}
 		}
 	}
 	client->SendServerToClient(": " ERR_NOSUCHCHANNEL " " + client->getNickname() + " " 
-	+ setChannel + " :No such channel\r\n");
+	+ setChannel + " :No such channel");
 	return;
 }
 
@@ -81,7 +81,7 @@ int IRC::Invite::checkUser(Client* client ,Server* server)
 				return 0;
 		}
 	}
-	client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + " " + setInviteNick + "  :No such nick/channel\r\n");
+	client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + " " + setInviteNick + "  :No such nick/channel");
 	return 1;
 }
 

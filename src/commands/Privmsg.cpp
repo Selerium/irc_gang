@@ -7,7 +7,7 @@ IRC::Privmsg::~Privmsg(){}
 void IRC::Privmsg::excutePrivmsg(Parse *parse, Client* client, Server* server)
 {
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 
@@ -16,7 +16,7 @@ void IRC::Privmsg::excutePrivmsg(Parse *parse, Client* client, Server* server)
 	if (ParseLine(parse, client) == false)
 	{
 		if (getMsg() == "")
-			client->SendServerToClient(": "  ERR_NOTEXTTOSEND  " :" + client->getNickname() + " :No text to send\r\n");
+			client->SendServerToClient(": "  ERR_NOTEXTTOSEND  " :" + client->getNickname() + " :No text to send");
 		else 
 			checkReceive(server, client);
 	}
@@ -27,7 +27,7 @@ bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
 
     if (parameters.empty())
     {
-        client->SendServerToClient(":" ERR_NORECIPIENT ":" + client->getNickname() + " :No recipient given PRIVMSG\r\n");
+        client->SendServerToClient(":" ERR_NORECIPIENT ":" + client->getNickname() + " :No recipient given PRIVMSG");
         client->SendServerToClient(":" ERR_NOTEXTTOSEND ":" + client->getNickname() + " :No text to send");
         return true;
     }
@@ -35,7 +35,7 @@ bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
     std::string receiver = parameters[0];
     if (receiver[0] == ':')
     {
-        client->SendServerToClient(":" ERR_NORECIPIENT ":" + client->getNickname() + " :No recipient given PRIVMSG\r\n");
+        client->SendServerToClient(":" ERR_NORECIPIENT ":" + client->getNickname() + " :No recipient given PRIVMSG");
         return true;
     }
 
@@ -54,7 +54,7 @@ bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
             }
             else if ((*it)[0] != ':' && !textFound)
             {
-                client->SendServerToClient(":" ERR_NOTEXTTOSEND ":" + client->getNickname() + " :No text to send\r\n");
+                client->SendServerToClient(":" ERR_NOTEXTTOSEND ":" + client->getNickname() + " :No text to send");
                 return true;
             }
             setMsg(*it + " ");
@@ -77,7 +77,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
 				{
 					if (it->second->_clients.find(client)->second == 1)
-						it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n");
+						it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
 				}
 				return;
 			}
@@ -92,7 +92,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			{
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
-					it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n");
+					it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
 			return;
 			}
 		}
@@ -112,13 +112,13 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			{
 				if (it->second->getNickname() == getReceiver())
 				{
-					server->clients_map[it->first]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n"); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
+					server->clients_map[it->first]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
 					return;
 				}
 			}
 		}
 	}
-	client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + "  :No such nick/channel\r\n");
+	client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + "  :No such nick/channel");
 }
 
 
@@ -126,7 +126,7 @@ void IRC::Privmsg::sendToAll(Server* server)
 {
 	std::map<int , Client *>::iterator it;
 	for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
-			server->clients_map[it->second->getClientFd()]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg + "\r\n");
+			server->clients_map[it->second->getClientFd()]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
 }
 
 void IRC::Privmsg::setReceiver(std::string str){ this->_receiver = str;}

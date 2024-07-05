@@ -7,7 +7,7 @@ IRC::Kick::~Kick(){}
 void IRC::Kick::excuteKick(Parse *parse, Client* client, Server* server)
 {
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 
@@ -21,7 +21,7 @@ int IRC::Kick::parseMsg(Parse *parse, Client* client)
 	if (parameters.empty() || parameters.size() < 2 || parameters[0][0] == ':' || parameters[1][0] == ':')
 	{
 		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-		+ " KICK " ":Not enough parameters\r\n");
+		+ " KICK " ":Not enough parameters");
 		return 1;
 	}
 
@@ -59,31 +59,31 @@ void IRC::Kick::checkChannel(Client* client, Server* server)
 					if (it->second->_clients.find(client)->second == 0)
 					{
 						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED " " + client->getNickname() + " " + setChannel
-							+ " :You're not channel operator\r\n");
+							+ " :You're not channel operator");
 						return;
 					}
 					else
 					{
 						if (it->second->FindClient(setkickNick) != NULL)
 						{
-							it->second->FindClient(setkickNick)->SendServerToClient("You were kicked by " + client->getNickname() + " (Reason:  " + comment + ")\r\n");
+							it->second->FindClient(setkickNick)->SendServerToClient("You were kicked by " + client->getNickname() + " (Reason:  " + comment + ")");
 							it->second->sendToall(setkickNick + " was kicked by " + client->getNickname() + " (Reason:  " + comment + ")\r\n");
 							it->second->removeNick(it->second->FindClient(setkickNick), setkickNick);
 						}
 						else
 							client->SendServerToClient(": " ERR_USERNOTINCHANNEL " " + client->getNickname() + " " + setkickNick + " " + setChannel
-							+ " :They aren't on that channel\r\n");
+							+ " :They aren't on that channel");
 					}
 				}
 				else 
 					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + " "
-					+ setChannel + " :You're not on that channel\r\n");
+					+ setChannel + " :You're not on that channel");
 				return;
 			}
 		}
 	}
 	client->SendServerToClient(": " ERR_NOSUCHCHANNEL " " + client->getNickname() + " " 
-	+ setChannel + " :No such channel\r\n");
+	+ setChannel + " :No such channel");
 	return;
 
 }

@@ -11,13 +11,13 @@ void IRC::Ping::excutePing(Parse *parse, Client* client, Server* server)
 	std::string uniqueToken = "";
 
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 
 	if (!parse->getParameters().empty()) 
 		std::string uniqueToken = parse->getParameters()[0];
-	client->SendServerToClient("PONG " + uniqueToken + "\r\n");
+	client->SendServerToClient("PONG " + uniqueToken);
 
 	// irssi doesnt handel these cases // but keep her for evaluation 
 	// if (!parse->getParameters().empty()) 

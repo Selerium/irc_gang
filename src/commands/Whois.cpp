@@ -7,7 +7,7 @@ IRC::Whois::~Whois(){}
 void IRC::Whois::excuteWhois(Parse *parse, Client* client, Server* server)
 {
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 
@@ -24,24 +24,24 @@ void IRC::Whois::excuteWhois(Parse *parse, Client* client, Server* server)
 				{
 						client->SendServerToClient(": " ERR_NOSUCHNICK " "  
 						+ client->getNickname() +  " " + parse->getParameters()[0] 
-						+ " :has identified for this nick\r\n");
+						+ " :has identified for this nick");
 
 						client->SendServerToClient(": " RPL_WHOISUSER " "  
 						+ client->getNickname() +  " " + it->second->getNickname() + " " + it->second->getUsername()
 						+ " " + it->second->getHostname()
-						+ " * :" + it->second->getUsername() + "\r\n");
+						+ " * :" + it->second->getUsername() + "");
 
 						client->SendServerToClient(": " RPL_ENDOFWHOIS " "  
 						+ client->getNickname() +  " " + it->second->getNickname()
-						+ " :End of /WHOIS list\r\n");
+						+ " :End of /WHOIS list");
 						return;
 				}
 			}
 		}
-		client->SendServerToClient( ": " ERR_NOSUCHNICK " " +  client->getNickname() +  " " + parse->getParameters()[0] + " :No such nick/channel\r\n"); 
+		client->SendServerToClient( ": " ERR_NOSUCHNICK " " +  client->getNickname() +  " " + parse->getParameters()[0] + " :No such nick/channel"); 
 	}
 	else
-		client->SendServerToClient( ": " ERR_NONICKNAMEGIVEN " " +  client->getNickname() + " :No nickname given\r\n");
+		client->SendServerToClient( ": " ERR_NONICKNAMEGIVEN " " +  client->getNickname() + " :No nickname given");
 
 }
 

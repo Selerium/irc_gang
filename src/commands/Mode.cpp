@@ -20,13 +20,13 @@ std::string print_num(int num) {
 void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 {
 	if (parse->getParameters().empty()) {
-		client->SendServerToClient("Parse error\r\n");
+		client->SendServerToClient("Parse error");
 		return ;
 	}
 	std::vector<std::string> parameter = parse->getParameters();
 
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient("failed\r\n");
+		client->SendServerToClient("failed");
 		return ;
 	}
 	
@@ -38,21 +38,21 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 		{
 			if (parameter.size() == 1)
 			{
-				client->SendServerToClient("Channel name :" + it->second->getChannelName() + "\r\n");
+				client->SendServerToClient("Channel name :" + it->second->getChannelName() + "");
 				
 				if (it->second->getsetLimit() == true)
-					client->SendServerToClient("User limit : TRUE : " + print_num(it->second->getLimit()) + "\r\n");
+					client->SendServerToClient("User limit : TRUE : " + print_num(it->second->getLimit()) + "");
 				else
-					client->SendServerToClient("User limit : FALSE\r\n");
+					client->SendServerToClient("User limit : FALSE");
 				
 				if (it->second->getChannelMode() == true)
-					client->SendServerToClient("Channel pass : TRUE : " + it->second->getChannelPassword() + "\r\n");
+					client->SendServerToClient("Channel pass : TRUE : " + it->second->getChannelPassword() + "");
 				else
-					client->SendServerToClient("Channel pass : FALSE\r\n");
+					client->SendServerToClient("Channel pass : FALSE");
 
-				client->SendServerToClient("Channel privilage : " + print_num(it->second->getChannelMode()) + "\r\n");
+				client->SendServerToClient("Channel privilage : " + print_num(it->second->getChannelMode()) + "");
 
-				client->SendServerToClient("Channel Topic : " + print_num(it->second->getTopicMode()) + " : " + it->second->getTopic() + "\r\n");
+				client->SendServerToClient("Channel Topic : " + print_num(it->second->getTopicMode()) + " : " + it->second->getTopic() + "");
 			}
 			if (parameter[1] == "+L" || parameter[1] == "+l")
 			{
@@ -103,7 +103,7 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 		}
 	}
 	if (it == server->channel_map.end())
-		client->SendServerToClient("server doesnt exist\r\n");
+		client->SendServerToClient("server doesnt exist");
 	(void)client;
 	(void)server;
     (void)parse;

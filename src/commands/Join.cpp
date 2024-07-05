@@ -10,16 +10,16 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 
 	// authentication check
 	if	(client->getAuthantication() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered\r\n");
+		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 	if (parse->getParameters().empty()) {
-		client->SendServerToClient("Parse error\r\n");
+		client->SendServerToClient("Parse error");
 		return ;
 	}
 
 	if (parameter.size() == 0)
-		client->SendServerToClient("Parse error\r\n");
+		client->SendServerToClient("Parse error");
 	if (parameter.size() > 1)
 	{
 		if (channelExist(parameter[0], server) == false) {

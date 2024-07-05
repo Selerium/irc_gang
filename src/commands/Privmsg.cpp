@@ -140,7 +140,7 @@ void IRC::Privmsg::sendToAll(Server* server)
 {
 	std::map<int , Client *>::iterator it;
 	for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
-			server->clients_map[it->second->getClientFd()]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
+			server->clients_map[it->second->getClientFd()]->SendServerToClient(getSender() + " PRIVMSG $ " +  this->_Msg);
 }
 
 void IRC::Privmsg::setReceiver(std::string str){ this->_receiver = str;}

@@ -66,40 +66,53 @@ bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
 
 void IRC::Privmsg::checkReceive(Server* server, Client* client)
 {
-	if (getReceiver()[1] == '@' && getReceiver()[0] == '#')
+	Parse parse;
+	if (getReceiver().length() && getReceiver()[0] == '@' && getReceiver()[1] == '#')
 	{
+		parse.Debug_msg("send to channel mods");
 		std::map<int, Channel *>::iterator it;
-		for (it = server->channel_map.begin(); it !=server->channel_map.end(); ++it)
+		for (it = server->channel_map.begin(); it != server->channel_map.end(); ++it)
 		{
-			if (it->second->getChannelName() == getReceiver())
+			parse.Debug_msg(it->second->getChannelName() + " - " + getReceiver());
+			if (it->second->getChannelName() == getReceiver().substr(1))
 			{
 				std::map<Client *, int>::iterator it2;
-				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
+				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++)
 				{
-					if (it->second->_clients.find(client)->second == 1)
-						it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
+					parse.Debug_msg(it2->first->getNickname());
+					if (it2->second == 1)
+						it2->first->SendServerToClient(getSender() + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;
 			}
 		}
+		return ;
 	}
-	else if (getReceiver()[0] == '#')
+	else if (getReceiver().length() && getReceiver()[0] == '#')
 	{
 		std::map<int, Channel *>::iterator it;
-		for (it = server->channel_map.begin(); it !=server->channel_map.end(); ++it)
+		for (it = server->channel_map.begin(); it != server->channel_map.end(); ++it)
 		{
+			parse.Debug_msg(it->second->getChannelName() + " - " + getReceiver());
+			parse.Debug_msg(it->second->getChannelName() == getReceiver() ? "yes" : "no");
 			if (it->second->getChannelName() == getReceiver())
 			{
+				parse.Debug_msg("found the channel! " + getReceiver());
 				std::map<Client *, int>::iterator it2;
-				for(it2 = it->second->_clients.begin(); it2 == it->second->_clients.end(); it2++)
-					it2->first->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg);
-			return;
+				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++) {
+					parse.Debug_msg(it2->first->getNickname());
+					it2->first->SendServerToClient(getSender() + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
+				}
+				return;
 			}
 		}
+		return ;
 		// maybe i should choeck for mode
 	}
-	else if (getReceiver()[0] == '%' && getReceiver()[1] == '*' && getReceiver().length() == 2)
+	// else if (getReceiver().length() >= 2 && getReceiver()[0] == '%' && getReceiver()[1] == '*')
+	else if (getReceiver().length() && getReceiver()[0] == '$')
 	{
+		parse.Debug_msg("send to everyone");
 		sendToAll(server);
 		return;
 	}
@@ -112,11 +125,12 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			{
 				if (it->second->getNickname() == getReceiver())
 				{
-					server->clients_map[it->first]->SendServerToClient("[ " + getSender() + " ] " +  this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
+					server->clients_map[it->first]->SendServerToClient(getSender() + " PRIVMSG " + getReceiver() + " :" + this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
 					return;
 				}
 			}
 		}
+		return ;
 	}
 	client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + "  :No such nick/channel");
 }

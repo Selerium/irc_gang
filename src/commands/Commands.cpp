@@ -127,8 +127,7 @@ void IRC::Commands::WelcomeMsg(Client* client)
 								+ " :Welcome to the Internet Relay Network, "
 								+ client->getNickname()
 								+ "!"
-								+ client->getUsername()
-								+ "\r\n";
+								+ client->getUsername();
 	client->SendServerToClient(welcomeMsg);
 	client->SendServerToClient(":irc 002 " + client->getNickname() + " :Your host is irc, running version 1.3");
 	client->SendServerToClient(":irc 003 " + client->getNickname() + " :This server was created july->2024");

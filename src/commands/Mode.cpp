@@ -19,12 +19,16 @@ std::string print_num(int num) {
 
 void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 {
+	if (parse->getParameters().empty()) {
+		client->SendServerToClient("Parse error\r\n");
+		return ;
+	}
 	std::vector<std::string> parameter = parse->getParameters();
 
-	if	(client->getAuthantication() == false)
+	if	(client->getAuthantication() == false) {
 		client->SendServerToClient("failed\r\n");
-	if (parameter.size() == 0)
-		client->SendServerToClient("Parse error\r\n");
+		return ;
+	}
 	
 	std::string channelname = parameter[0];
 	std::map<int, Channel *>::iterator it;
@@ -34,7 +38,7 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 		{
 			if (parameter.size() == 1)
 			{
-				client->SendServerToClient(it->second->getChannelName() + "\r\n");
+				client->SendServerToClient("Channel name :" + it->second->getChannelName() + "\r\n");
 				
 				if (it->second->getsetLimit() == true)
 					client->SendServerToClient("User limit : TRUE : " + print_num(it->second->getLimit()) + "\r\n");
@@ -98,6 +102,8 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 			}
 		}
 	}
+	if (it == server->channel_map.end())
+		client->SendServerToClient("server doesnt exist\r\n");
 	(void)client;
 	(void)server;
     (void)parse;

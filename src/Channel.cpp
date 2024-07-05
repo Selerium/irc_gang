@@ -4,6 +4,7 @@ Channel::Channel(std::string name, std::string pass) : _Name(name), _Password(pa
 {
 	this->_clientAmount = 0;
 	this->_inviteOnly = false;
+	this->_topicMode = false;
 	this->_setLimit = true;
 	this->_limit = 10;
 }

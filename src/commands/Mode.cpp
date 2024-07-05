@@ -5,16 +5,10 @@ IRC::Mode::Mode(){}
 IRC::Mode::~Mode(){}
 
 std::string print_num(int num) {
-	std::string result;
-	char c;
-
-	while (num) {
-		c = (num % 10) - '0';
-		result.insert(result.end(), c);
-		num /= 10;
-	}
-	std::cout << result << std::endl;
-	return result;
+	std::stringstream result;
+	result << num;
+	std::string str = result.str();
+	return (str);
 }
 
 void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
@@ -23,13 +17,19 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 		client->SendServerToClient("Parse error");
 		return ;
 	}
-	std::vector<std::string> parameter = parse->getParameters();
 
 	if	(client->getAuthantication() == false) {
 		client->SendServerToClient("failed");
 		return ;
 	}
-	
+
+	if (server->channel_map.empty())
+	{
+		client->SendServerToClient("empty");
+		return;
+	}
+
+	std::vector<std::string> parameter = parse->getParameters();
 	std::string channelname = parameter[0];
 	std::map<int, Channel *>::iterator it;
 	for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
@@ -38,18 +38,18 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 		{
 			if (parameter.size() == 1)
 			{
-				client->SendServerToClient("Channel name :" + it->second->getChannelName() + "");
+				client->SendServerToClient("Channel name :" + it->second->getChannelName());
 				
 				if (it->second->getsetLimit() == true)
-					client->SendServerToClient("User limit : TRUE : " + print_num(it->second->getLimit()) + "");
+					client->SendServerToClient("User limit : TRUE : " + print_num(it->second->getLimit()));
 				else
 					client->SendServerToClient("User limit : FALSE");
-				
+
 				if (it->second->getChannelMode() == true)
-					client->SendServerToClient("Channel pass : TRUE : " + it->second->getChannelPassword() + "");
+					client->SendServerToClient("Channel pass : TRUE");
 				else
 					client->SendServerToClient("Channel pass : FALSE");
-				
+
 				if (it->second->checkPermission(client) == 0)
 					client->SendServerToClient("Channel privilage : User");
 				else if (it->second->checkPermission(client) == 1)
@@ -59,7 +59,8 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 				else
 					client->SendServerToClient("Channel privilage : NON");
 
-				client->SendServerToClient("Channel Topic : " + print_num(it->second->getTopicMode()) + " : " + it->second->getTopic() + "");
+				client->SendServerToClient("Channel Topic :  : " + it->second->getTopic() + "");
+
 			}
 			if (parameter[1] == "+L" || parameter[1] == "+l")
 			{
@@ -109,7 +110,7 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 			}
 		}
 	}
-	if (it == server->channel_map.end() && it->second->getChannelName() != channelname)
+	if (it == server->channel_map.end())
 		client->SendServerToClient("server doesnt exist");
 	(void)client;
 	(void)server;
@@ -150,6 +151,8 @@ void Channel::removePass(Client* client)
 {
 	if (checkPermission(client) == 1)
 		this->_Password = "";
+		else
+		client->SendServerToClient(": No permissions to change pass");
 }
 
 void Channel::setPass(Client* client, std::string str)

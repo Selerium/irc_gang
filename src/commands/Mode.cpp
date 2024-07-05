@@ -13,24 +13,24 @@ std::string print_num(int num) {
 
 void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 {
+	if	(client->isregisterd() == false) {
+		client->SendServerToClient(client->getNickname() + " :" + ERROR_451 + " You have not registered");
+		return ;
+	}
+
 	if (parse->getParameters().empty()) {
-		client->SendServerToClient("Parse error");
+		client->SendServerToClient(client->getNickname() + " " +"MODE :" + ERROR_461 + " Not enough parameters");
 		return ;
-	}
-
-	if	(client->getAuthantication() == false) {
-		client->SendServerToClient("failed");
-		return ;
-	}
-
-	if (server->channel_map.empty())
-	{
-		client->SendServerToClient("empty");
-		return;
 	}
 
 	std::vector<std::string> parameter = parse->getParameters();
 	std::string channelname = parameter[0];
+	if (server->channel_map.empty())
+	{
+		client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
+		return;
+	}
+
 	std::map<int, Channel *>::iterator it;
 	for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
 	{
@@ -159,7 +159,7 @@ void Channel::removePass(Client* client)
 {
 	if (checkPermission(client) == 1)
 		this->_Password = "";
-		else
+	else
 		client->SendServerToClient(": No permissions to change pass");
 }
 

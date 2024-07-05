@@ -7,7 +7,7 @@ IRC::Topic::~Topic(){}
 
 void IRC::Topic::excuteTopic(Parse *parse, Client* client, Server* server)
 {
-	if	(client->getAuthantication() == false) {
+	if	(client->isregisterd() == false) {
 		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}

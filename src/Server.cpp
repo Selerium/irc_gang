@@ -41,9 +41,12 @@ Server::~Server()
 {
 	std::cout << "Free all data" << std::endl;
 	if (this->result != NULL) {
-        freeaddrinfo(this->result);
-    }
+		freeaddrinfo(this->result);
+	}
 	delete[] this->pfds;
+	for (std::map<int, Client *>::iterator it = clients_map.begin(); it != clients_map.end(); it++) {
+		delete it->second;
+	}
 }
 
 void Server::GetaddrInfo()

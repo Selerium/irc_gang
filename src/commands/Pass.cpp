@@ -10,7 +10,7 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty())
 	{
-		client->SendServerToClient(": " ERROR_461 " :Not enough parameters");
+		client->SendServerToClient(":" ERROR_461 " Not enough parameters");
 		
 
 		return;
@@ -28,7 +28,7 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 
 	if (checkClientPass(server))
 	{
-		client->SendServerToClient(": " ERROR_464 "Password incorrect");
+		client->SendServerToClient(":" ERROR_464 " Password incorrect");
 		return;
 	}
 	server->clients_map[client->getClientFd()]->setAuthantication(true);

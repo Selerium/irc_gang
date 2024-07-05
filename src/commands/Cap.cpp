@@ -9,7 +9,7 @@ void IRC::Cap::excuteCap(Parse *parse, Client* client, Server* server)
 	(void)server;
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty())
-		client->SendServerToClient("{EMPTY FIX LATER}");
+		client->SendServerToClient(":irc CAP " + client->getNickname() + " LS");
 	else if (parse->getParameters()[0] == "LS")
 		client->SendServerToClient("CAP * ACK : LS 302");
 	else if (parse->getParameters()[0] == "END")

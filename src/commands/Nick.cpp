@@ -41,11 +41,11 @@ void	IRC::Nick::excuteNick(Parse *parse, Client* client, Server* server)
 	if (!client->getAuthantication())
 		client->SendServerToClient(client->getNickname() + " :" + ERROR_451 + " You have not registered");
 	else if (parameter.empty()) 
-		client->SendServerToClient(client->getNickname() + ERROR_431);
+		client->SendServerToClient(client->getNickname() + " " ERROR_431);
 	else if (dup_names(parameter[0], server) == true)
-		client->SendServerToClient(client->getNickname() + ERROR_433);
+		client->SendServerToClient(client->getNickname() + " " + parameter[0] + " " ERROR_433);
 	else if (valid_nick(parameter[0]) == false)
-		client->SendServerToClient(client->getNickname() + ERROR_432);
+		client->SendServerToClient(client->getNickname() + " " + parameter[0] + " " ERROR_432);
 	else
 	{
 		std::string oldnick = client->getNickname();

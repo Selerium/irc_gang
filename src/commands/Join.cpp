@@ -9,7 +9,7 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 	std::vector<std::string> parameter = parse->getParameters();
 
 	// authentication check
-	if	(client->getAuthantication() == false) {
+	if	(client->isregisterd() == false) {
 		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}

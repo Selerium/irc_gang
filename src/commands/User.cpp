@@ -32,11 +32,6 @@ int IRC::User::parseMsg(Parse *parse, Client* client)
 		return 1;
 	}
 
-	if (parameters[0].length() > USERLEN)
-		client->setUsername(parameters[0].substr(0, 12));
-	else 
-		client->setUsername(parameters[0]);
-
 	std::vector<std::string>::iterator it;
 	bool textFound = false;
 	for (it = parameters.begin() + 3; it != parameters.end(); ++it)
@@ -57,6 +52,12 @@ int IRC::User::parseMsg(Parse *parse, Client* client)
 			realname += (*it + " ");
 		}
 	}
+
+	
+	if (parameters[0].length() > USERLEN)
+		client->setUsername(parameters[0].substr(0, 12));
+	else 
+		client->setUsername(parameters[0]);
 	client->setRealname(realname);
 	client->UserSet = true;
 	return 0;

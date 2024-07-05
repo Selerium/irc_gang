@@ -1,5 +1,6 @@
 #include "../../include/IRC.hpp"
 #include<algorithm>
+#include <string>
 
 
 IRC::Commands::Commands(){
@@ -16,8 +17,8 @@ IRC::Commands::Commands(){
 				commandMap["TOPIC"] = &Commands::topic;
 				commandMap["KICK"] = &Commands::kick;
 				commandMap["INVITE"] = &Commands::invite;
+				commandMap["LEAVE"] = &Commands::leave;
 }
-
 
 IRC::Commands::~Commands(){}
 
@@ -103,7 +104,6 @@ void IRC::Commands::privmsg(Parse *parse,Client* client, Server* server)
     IRC::Privmsg().excutePrivmsg(parse,client,server);
 }
 
-
 void IRC::Commands::topic(Parse *parse, Client* client, Server* server)
 {
     IRC::Topic().excuteTopic(parse,client,server);
@@ -132,4 +132,31 @@ void IRC::Commands::WelcomeMsg(Client* client)
 	client->SendServerToClient(":irc 002 " + client->getNickname() + " :Your host is irc, running version 1.3");
 	client->SendServerToClient(":irc 003 " + client->getNickname() + " :This server was created july->2024");
 	client->SendServerToClient(":irc 004 " + client->getNickname() + " :irc 1.3  itklo");
+}
+
+void IRC::Commands::leave(Parse *parse, Client *client, Server *server) {
+	(void) parse;
+
+	if (!client->isregisterd()) {
+		client->SendServerToClient(client->getNickname() + " :" + ERROR_451 + " You have not registered");
+		return ;
+	}
+
+	std::vector<std::string> parameter = parse->getParameters();
+	if (parameter.empty()) {
+		client->SendServerToClient(client->getNickname() + " " ERROR_431);
+		return ;
+	}
+
+	std::string channelName = parameter[0];
+	for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
+		if (it->second->getChannelName() == channelName) {
+			if (it->second->_clients.find(client) == it->second->_clients.end()) {
+				client->SendServerToClient(client->getNickname() + " " + channelName + " :" "");
+				return ;
+			}
+			it->second->_clients.find(client)->second = 1;
+			it->second->removeNick(client, client->getNickname());
+		}
+	}
 }

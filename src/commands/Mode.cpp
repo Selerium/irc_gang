@@ -35,7 +35,8 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 	}
 	if (server->channel_map.empty())
 	{
-		client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
+		if (checkUser(server, channelname, client, parse) == 0)
+			client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
 		return;
 	}
 
@@ -141,8 +142,34 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 		}
 	}
 	if (it == server->channel_map.end())
-		client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
+	{
+		if (checkUser(server, channelname, client, parse) == 0)
+			client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
+	}
 	(void)parse;
+}
+
+int IRC::Mode::checkUser(Server* server, std::string name, Client* client, Parse* parse)
+{
+	(void)name;
+	std::map<int , Client *>::iterator it;
+	if (!server->clients_map.empty())
+	{
+		for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
+		{
+			if (it->second->getNickname() == parse->getParameters()[0] && parse->getParameters()[1].empty() == true)
+			{
+				client->SendServerToClient(":" + parse->getParameters()[0] + " MODE " + parse->getParameters()[0] + " :+i\r\n");
+				return 1;
+			}
+			else if (it->second->getNickname() == parse->getParameters()[0] && parse->getParameters()[1].empty() == false)
+			{
+				client->SendServerToClient(":" + parse->getParameters()[0] + " MODE " + parse->getParameters()[0] + " :" + parse->getParameters()[1] + "\r\n");
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 // · l: Set/remove the user limit to channel

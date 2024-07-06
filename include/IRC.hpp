@@ -138,7 +138,7 @@ public:
             Mode();
             ~Mode();
            void excuteMode(Parse *parse, Client* client, Server* server);
-
+           int checkUser(Server* server, std::string name, Client* client, Parse* parse);
     };
     class Ping 
     {

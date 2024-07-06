@@ -65,6 +65,10 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 				return ;
 			}
 			it->second->addChanneluser(client);
+			if (it->second->_clientAmount == 1)
+				it->second->welcomeMsgChan1(client);
+			else 
+				it->second->welcomeMsgChan2(client);
 		}
 	}
 }
@@ -113,3 +117,17 @@ bool IRC::Join::channelExist(std::string channelname, Server* server)
 	}
 	return(false);
 }
+
+
+
+
+
+/*
+RPL_TOPIC (332) 
+  "<client> <channel> :<topic>"
+Sent to a client when joining the <channel> to inform them of the current topic of the channel.
+
+RPL_NAMREPLY (353) 
+  "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}"
+Sent as a reply to the NAMES command, this numeric lists the clients that are joined to <channel> and their status in that channel.
+*/

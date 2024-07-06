@@ -52,6 +52,9 @@ class Channel
 		void sendToall(std::string msg);
 		void removeNick(Client* client, std::string nick);
 		int checkPermission(Client* client);
+		void welcomeMsgChan1(Client* client);
+		void welcomeMsgChan2(Client* client);
+
 
 //MODESTUFF
 		void removeLimit(Client* client);

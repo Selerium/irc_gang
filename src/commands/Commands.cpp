@@ -33,7 +33,6 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 {
 	while (!parse->_messages.empty())
 	{
-
 		std::map<std::string, CommandFunction>::iterator it = commandMap.find(toUpperCase(parse->getCommand()));
 		if (it != commandMap.end())
 		{

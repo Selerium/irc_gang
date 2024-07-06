@@ -97,6 +97,10 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			parse.Debug_msg(it->second->getChannelName() == getReceiver() ? "yes" : "no");
 			if (it->second->getChannelName() == getReceiver())
 			{
+				if (it->second->FindClient(client->getNickname()) == NULL) {
+					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + "You are not in channel");
+					return ;
+				}
 				parse.Debug_msg("found the channel! " + getReceiver());
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++) {

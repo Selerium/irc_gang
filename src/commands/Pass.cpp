@@ -48,6 +48,9 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 					tmp[i] = server->pfds[i];
 			}
 		}
+		delete[] server->pfds;
+		server->pfds = tmp;
+		server->setNumFds(server->getNumFds() - 1);
 
 		//remove client from clients_map
 		server->clients_map.erase(client->getClientFd());

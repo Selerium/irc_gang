@@ -88,36 +88,45 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					int num = std::atoi(parameter[2].c_str());
 					it->second->setLimiter(client, num);
 				}
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +l " + parameter[2]);
 			}
-			else if (parameter[1] == "-L" || parameter[1] == "-l")
+			else if (parameter[1] == "-L" || parameter[1] == "-l") {
 				it->second->removeLimit(client);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -l ");
+			}
 			else if (parameter[1] == "+K" || parameter[1] == "+k")
 			{
 				it->second->setPass(client, parameter[2]);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +k " + parameter[2]);
 			}
-			else if (parameter[1] == "-K" || parameter[1] == "-k")
+			else if (parameter[1] == "-K" || parameter[1] == "-k") {
 				it->second->removePass(client);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -k ");
+			}
 			else if (parameter[1] == "+I" || parameter[1] == "+i")
 			{
 				if (parameter.size() == 2)
 					it->second->setChannelMode(client, true);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +i ");
 			}
 			else if (parameter[1] == "-I" || parameter[1] == "-i")
 			{
 				if (parameter.size() == 2)
 					it->second->setChannelMode(client, false);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -i ");
 			}
 			else if (parameter[1] == "+O" || parameter[1] == "+o")
 			{
 				if (!it->second->FindClient(parameter[2])) {
 					client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
+					it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +o " + parameter[2]);
 					return ;
 				}
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 				{
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
 					//:Wifey!~Wifey@5.195.225.158 MODE #cha1 +o Wifey_
-					it->second->sendToall(":" + client->getNickname() + " MODE " + it->second->getChannelName() +" +o " + parameter[2]);
+					it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +o " + parameter[2]);
 				}
 			}
 			else if (parameter[1] == "-O" || parameter[1] == "-o")
@@ -128,16 +137,19 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 				}
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), false);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -o " + parameter[2]);
 			}
 			else if (parameter[1] == "+T" || parameter[1] == "+t")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +t ");
 			}
 			else if (parameter[1] == "-T" || parameter[1] == "-t")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), false);
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -t ");
 			}
 			else {
 				client->SendServerToClient(client->getNickname() + " " + parameter[1] + " :is unknown mode char to me");

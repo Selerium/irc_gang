@@ -49,7 +49,7 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 	{
 		if (it->second->getChannelName() == channelname)
 		{
-			if (it->second->getsetLimit() && it->second->_clientAmount == it->second->getLimit()) {
+			if (it->second->getsetLimit() && it->second->_clientAmount >= it->second->getLimit()) {
 				client->SendServerToClient(":471 " + client->getNickname() + "!" + client->getUsername() + " JOIN " + " " + channelname + " :Cannot join channel (+l)");
 				return ;
 			}

@@ -36,13 +36,12 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 		std::map<std::string, CommandFunction>::iterator it = commandMap.find(toUpperCase(parse->getCommand()));
 		if (it != commandMap.end())
 		{
-			if (client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
+			(this->*(it->second))(parse,client, server);
+			if ((parse->getParameters()[0] != "QUIT" && parse->getParameters()[0] != "KICK") && client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
 			{
 				WelcomeMsg(client);
 				client->setWelcomeMsg(true);
 			}
-			(this->*(it->second))(parse,client, server);
-
 		}
 		else 
 		{

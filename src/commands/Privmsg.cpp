@@ -81,7 +81,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				{
 					parse.Debug_msg("sending message to an operator");
 					if (it2->second == 1 && it2->first->getNickname() != client->getNickname())
-						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
+						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;
 			}
@@ -98,7 +98,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			if (it->second->getChannelName() == getReceiver())
 			{
 				if (it->second->FindClient(client->getNickname()) == NULL) {
-					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + "You are not in channel");
+					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + "!" + client->getUsername() + "" + " PRIVMSG " + getReceiver() + " :" + "You are not in channel");
 					return ;
 				}
 				parse.Debug_msg("found the channel! " + getReceiver());
@@ -106,7 +106,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++) {
 					parse.Debug_msg(it2->first->getNickname());
 					if (it2->second != 2 && it2->first->getNickname() != client->getNickname())
-						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
+						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;
 			}
@@ -130,7 +130,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			{
 				if (it->second->getNickname() == getReceiver())
 				{
-					server->clients_map[it->first]->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
+					server->clients_map[it->first]->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "" + " PRIVMSG " + getReceiver() + " :" + this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
 					return;
 				}
 			}

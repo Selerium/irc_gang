@@ -28,7 +28,29 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 
 	if (checkClientPass(server))
 	{
-		client->SendServerToClient(":" ERROR_464 " Password incorrect");
+		std::vector<std::string> sample = parse->getParameters();
+
+		//server acknowledges and replies with ERROR :Disconnected from server
+		client->SendServerToClient("ERROR :");
+
+		//remove client from pfds array and closed pfd fd
+		struct pollfd *tmp = new struct pollfd[server->getNumFds() - 1];
+		bool found = false;
+		for (int i = 0; i < server->getNumFds(); i++) {
+			if (server->pfds[i].fd == client->getClientFd()) {
+				close(server->pfds[i].fd);
+				found = true;
+			}
+			else {
+				if (found)
+					tmp[i] = server->pfds[i + 1];
+				else
+					tmp[i] = server->pfds[i];
+			}
+		}
+
+		//remove client from clients_map
+		server->clients_map.erase(client->getClientFd());
 		return;
 	}
 	server->clients_map[client->getClientFd()]->setAuthantication(true);

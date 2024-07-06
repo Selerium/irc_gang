@@ -21,7 +21,7 @@ int IRC::Invite::parseMsg(Parse *parse, Client* client)
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty() || parameters.size() < 2)
 	{
-		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() + "!" + client->getUsername() + "@localhost INVITE :Not enough parameters");
+		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() + "!" + client->getUsername() + " INVITE :Not enough parameters");
 		return 1;
 	}
 	setInviteNick = parameters[0];
@@ -46,17 +46,17 @@ void IRC::Invite::checkChannel(Client* client, Server* server)
 				{
 					if (it->second->_clients.find(client)->second == 0)
 					{
-						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED + client->getNickname() + "!" + client->getUsername() + "@localhost INVITE :You're not channel operator");
+						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED + client->getNickname() + "!" + client->getUsername() + " INVITE :You're not channel operator");
 						return;
 					}
 					else
 					{
 						if (it->second->FindClient(setInviteNick) != NULL)
-							client->SendServerToClient(": " ERR_USERONCHANNEL + client->getNickname() + "!" + client->getUsername() + "@localhost INVITE :User is already on channel");
+							client->SendServerToClient(": " ERR_USERONCHANNEL + client->getNickname() + "!" + client->getUsername() + " INVITE :User is already on channel");
 						else {
 							for (std::map<int, Client *>::iterator it2 = server->clients_map.begin(); it2 != server->clients_map.end(); it2++) {
 								if (it2->second->getNickname() == setInviteNick) {
-									it2->second->SendServerToClient(": " + client->getNickname() + "!" + client->getUsername() + "@localhost INVITE " + setInviteNick +  " " + setChannel + ":");
+									it2->second->SendServerToClient(": " + client->getNickname() + "!" + client->getUsername() + " INVITE " + setInviteNick +  " " + setChannel + ":");
 									it->second->_clients.insert(std::make_pair(it2->second, 2));
 								}
 							}
@@ -65,12 +65,12 @@ void IRC::Invite::checkChannel(Client* client, Server* server)
 					}
 				}
 				else 
-					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + "!" + client->getUsername() + "@localhost INVITE " + setInviteNick +  " " + setChannel + " :You're not on that channel");
+					client->SendServerToClient(": " ERR_NOTONCHANNEL " " + client->getNickname() + "!" + client->getUsername() + " INVITE " + setInviteNick +  " " + setChannel + " :You're not on that channel");
 				return;
 			}
 		}
 	}
-	client->SendServerToClient(": " ERR_NOSUCHCHANNEL " " + client->getNickname() + "!" + client->getUsername() + "@localhost INVITE " + setInviteNick +  " " + setChannel + " :No such channel");
+	client->SendServerToClient(": " ERR_NOSUCHCHANNEL " " + client->getNickname() + "!" + client->getUsername() + " INVITE " + setInviteNick +  " " + setChannel + " :No such channel");
 	return;
 }
 
@@ -89,7 +89,7 @@ int IRC::Invite::checkUser(Client* client ,Server* server)
 				return 0;
 		}
 	}
-	client->SendServerToClient(": " ERR_NOSUCHNICK " " + client->getNickname() + "!" + client->getUsername() + "@localhost INVITE " + setInviteNick +  " " + setChannel + ":No such nick/channel");
+	client->SendServerToClient(": " ERR_NOSUCHNICK " " + client->getNickname() + "!" + client->getUsername() + " INVITE " + setInviteNick +  " " + setChannel + ":No such nick/channel");
 	return 1;
 }
 

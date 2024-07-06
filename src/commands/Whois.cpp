@@ -78,7 +78,7 @@ RPL_WHOISCHANNELS (319)
   "<client> <nick> :[prefix]<channel>{ [prefix]<channel>}
 
   RPL_WHOISHOST (378) 
-  "<client> <nick> :is connecting from *@localhost 127.0.0.1"
+  "<client> <nick> :is connecting from * 127.0.0.1"
 
   RPL_WHOISMODES (379) 
   "<client> <nick> :is using modes +ailosw"

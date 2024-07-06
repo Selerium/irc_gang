@@ -14,11 +14,7 @@ void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server)
 		quit_msg.append(it->c_str());
 		quit_msg.append(" ");
 	}
-	parse->Debug_msg(quit_msg);
 
-	std::cout << "Clients BEFORE QUIT:" << std::endl;
-	server->printClients();
-	
 	//server acknowledges and replies with ERROR :Disconnected from server
 	client->SendServerToClient("ERROR :");
 
@@ -37,19 +33,29 @@ void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server)
 				tmp[i] = server->pfds[i];
 		}
 	}
+	delete[] server->pfds;
+	server->pfds = tmp;
+	server->setNumFds(server->getNumFds() - 1);
 
 	//server sends QUIT :<reason> to clients that share a channel with the user
 	//<reason> can be empty
 	if (!server->channel_map.empty()) {
 		for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
-			if (it->second->FindClient(client->getNickname()))
-				it->second->sendToall(client->getNickname() + "!" + client->getUsername() + "@localhost QUIT :" + quit_msg);
+			if (it->second->FindClient(client->getNickname())) {
+				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " QUIT :" + quit_msg);
+				it->second->_clientAmount--;
+				it->second->_clients.erase(client);
+				if (it->second->_clientAmount == 0) {
+					delete it->second;
+					server->channel_map.erase(it->first);
+					return ;
+				}
+			}
 		}
 	}
 
 	//remove client from clients_map
+	Client *todel = server->clients_map[client->getClientFd()];
 	server->clients_map.erase(client->getClientFd());
-
-	std::cout << "Clients AFTER QUIT:" << std::endl;
-	server->printClients();
+	delete todel;
 }

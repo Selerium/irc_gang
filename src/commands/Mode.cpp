@@ -114,7 +114,11 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					return ;
 				}
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
+				{
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
+					//:Wifey!~Wifey@5.195.225.158 MODE #cha1 +o Wifey_
+					it->second->sendToall(":" + client->getNickname() + " MODE " + it->second->getChannelName() +" +o " + parameter[2]);
+				}
 			}
 			else if (parameter[1] == "-O" || parameter[1] == "-o")
 			{

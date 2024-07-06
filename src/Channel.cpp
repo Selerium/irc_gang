@@ -149,9 +149,10 @@ void Channel::welcomeMsgChan1(Client* client)
 void Channel::welcomeMsgChan2(Client* client)
 {
 	std::map<Client *, int>::iterator it;
+
 	std::string clients_name;
 
-	client->SendServerToClient(":" + client->getNickname() + " JOIN " + getChannelName());
+	this->sendToall(":" + client->getNickname() + " JOIN " + getChannelName() + " * :" + client->getNickname());
 	if (getTopic() != "")
 		client->SendServerToClient( ":irc 332 " + client->getNickname()+ " " + getChannelName() + " :" + getTopic());
 	for(it = this->_clients.begin(); it != this->_clients.end(); it++)
@@ -167,7 +168,13 @@ void Channel::welcomeMsgChan2(Client* client)
 	// client->SendServerToClient("Successfully joined channel: [" + getChannelName() + "] as a memebr.\r\n");
 	// (":" + client->getNickname() + " JOIN #"
 	// 						+ getChannelName() + "\r\n");
-	// sendToall(":" + client->getNickname() + " JOIN #" + getChannelName() + "\r\n");
+	// std::map<Client *, int>::iterator it2;
+	// for(it2 = this->_clients.begin(); it2 != this->_clients.end(); it2++)
+	// {
+	// 	if (it2->second != 2 && it2->first->getNickname() != client->getNickname())
+	// 		it2->first->SendServerToClient(":" + client->getNickname() + " JOIN #" + getChannelName() + " * :" + client->getNickname() +"\r\n");
+	// }
+
 
 // 	client->SendServerToClient( ": 353 " + client->getNickname() + " = " + getChannelName() + " :" + clients_name + "\r\n");
 

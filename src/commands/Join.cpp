@@ -41,7 +41,7 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* server, Client* client)
 {
 	Parse parse;
-	parse.Debug_msg(":" + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + channelname);
+	parse.Debug_msg(":" + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + channelname.substr(1));
 
 	std::map<int, Channel *>::iterator it;
 
@@ -66,7 +66,7 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 				it->second->welcomeMsgChan1(client);
 			else if (it->first != 2)
 				it->second->welcomeMsgChan2(client);
-			it->second->sendToall(":" + client->getNickname() +"!" + client->getUsername() + "@localhost JOIN " + channelname + " :");
+			// it->second->sendToall(":" + client->getNickname() +"!" + client->getUsername() + "@localhost JOIN " + channelname.substr(1) + " :");
 		}
 	}
 }

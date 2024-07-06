@@ -154,7 +154,7 @@ void Server::read_message(int fd, Parse *parse)
 
 		if (!this->channel_map.empty()) {
 		for (std::map<int, Channel *>::iterator it = this->channel_map.begin(); it != this->channel_map.end(); it++) {
-			if (it->second->FindClient(client->getNickname()))
+			if (client && it->second->FindClient(client->getNickname()))
 				it->second->sendToall(client->getNickname() + "!" + client->getUsername() + "@localhost QUIT : Disconnected from client");
 		}
 		clients_map.erase(this->client_sockfd);

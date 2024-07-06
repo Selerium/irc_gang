@@ -139,21 +139,21 @@ void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 	(void) parse;
 
 	if (!client->isregisterd()) {
-		client->SendServerToClient(client->getNickname() + " :" + ERROR_451 + " You have not registered");
+		client->SendServerToClient(":" ERROR_451 " localhost PART :You have not registered");
 		return ;
 	}
 
 	std::vector<std::string> parameter = parse->getParameters();
 	if (parameter.empty()) {
-		client->SendServerToClient(client->getNickname() + " " ERROR_431);
+		client->SendServerToClient(": " ERROR_431 " localhost PART :Not enough parameters");
 		return ;
 	}
 
 	std::string channelName = parameter[0];
 	for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
-		if (it->second->getChannelName() == channelName) {
+		if (it->second->getChannelName().substr(1) == channelName) {
 			if (it->second->_clients.find(client) == it->second->_clients.end()) {
-				client->SendServerToClient(client->getNickname() + " " + channelName + " :" "");
+				client->SendServerToClient(":" ERR_NOTONCHANNEL + client->getNickname() + "!" + client->getUsername() + "@localhost " + channelName + " :You are not in this channel");
 				return ;
 			}
 			it->second->_clients.find(client)->second = 1;

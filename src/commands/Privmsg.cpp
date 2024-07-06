@@ -105,7 +105,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++) {
 					parse.Debug_msg(it2->first->getNickname());
-					if (it2->first->getNickname() != client->getNickname())
+					if (it2->second != 2 && it2->first->getNickname() != client->getNickname())
 						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;

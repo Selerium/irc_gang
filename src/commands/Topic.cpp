@@ -57,7 +57,7 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 		std::map<int, Channel *>::iterator it;
 		for (it = server->channel_map.begin(); it !=server->channel_map.end(); ++it)
 		{
-			if (it->second->getChannelName() == setChannel)
+			if (it->second->getChannelName().substr(1) == setChannel)
 			{
 				if (it->second->FindClient(client->getNickname()) != NULL)
 				{

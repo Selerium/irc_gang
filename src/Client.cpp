@@ -32,7 +32,6 @@ void Client::setRealname(std::string name) {this->_RealName = name;}
 void Client::SendServerToClient(std::string msg)
 {
 	this->_ServerToClient += msg + "\r\n";
-
 }
 
 

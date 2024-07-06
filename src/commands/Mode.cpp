@@ -24,7 +24,15 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 	}
 
 	std::vector<std::string> parameter = parse->getParameters();
-	std::string channelname = parameter[0];
+	std::string channelname;
+	if (parameter.size() > 1) {
+		parse->Debug_msg("help");
+		channelname = '#' + parameter[0];
+	}
+	else {
+		channelname = parameter[0];
+		parse->Debug_msg("helpppp");
+	}
 	if (server->channel_map.empty())
 	{
 		client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
@@ -42,33 +50,36 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 			}
 			if (parameter.size() == 1)
 			{
-				client->SendServerToClient("Channel name :" + it->second->getChannelName());
+				client->SendServerToClient("Channel name |" + it->second->getChannelName());
 				
 				if (it->second->getsetLimit() == true)
-					client->SendServerToClient("User limit : TRUE : " + print_num(it->second->getLimit()));
+					client->SendServerToClient("User limit | TRUE | " + print_num(it->second->getLimit()));
 				else
-					client->SendServerToClient("User limit : FALSE");
+					client->SendServerToClient("User limit | FALSE");
 
 				if (it->second->getChannelMode() == true)
-					client->SendServerToClient("Channel pass : TRUE");
+					client->SendServerToClient("Requires invite | TRUE");
 				else
-					client->SendServerToClient("Channel pass : FALSE");
+					client->SendServerToClient("Requires invite | FALSE");
+
+				if (it->second->getChannelPassword().length())
+					client->SendServerToClient("Requires pass | TRUE");
+				else
+					client->SendServerToClient("Requires pass | FALSE");
 
 				if (it->second->checkPermission(client) == 0)
-					client->SendServerToClient("Channel privilage : User");
+					client->SendServerToClient("Channel privilage | User");
 				else if (it->second->checkPermission(client) == 1)
-					client->SendServerToClient("Channel privilage : Operator");
+					client->SendServerToClient("Channel privilage | Operator");
 				else if (it->second->checkPermission(client) == 2)
-					client->SendServerToClient("Channel privilage : Invited");
+					client->SendServerToClient("Channel privilage | Invited");
 				else
-					client->SendServerToClient("Channel privilage : NON");
+					client->SendServerToClient("Channel privilage | NON");
 
-				client->SendServerToClient("Channel Topic : " + print_num(it->second->getTopicMode()) + " : " + it->second->getTopic() + "");
+				client->SendServerToClient("Channel Topic | " + print_num(it->second->getTopicMode()) + " | " + it->second->getTopic() + "");
 				return ;
 			}
-			if (!it->second->FindClient(parameter[2])) {
-				client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
-			}
+
 			if (parameter[1] == "+L" || parameter[1] == "+l")
 			{
 				if (parameter.size() == 3)
@@ -97,11 +108,19 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 			}
 			else if (parameter[1] == "+O" || parameter[1] == "+o")
 			{
+				if (!it->second->FindClient(parameter[2])) {
+					client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
+					return ;
+				}
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
 			}
 			else if (parameter[1] == "-O" || parameter[1] == "-o")
 			{
+				if (!it->second->FindClient(parameter[2])) {
+					client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
+					return ;
+				}
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), false);
 			}
@@ -117,8 +136,8 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 			}
 			else {
 				client->SendServerToClient(client->getNickname() + " " + parameter[1] + " :is unknown mode char to me");
-				return ;
 			}
+			return ;
 		}
 	}
 	if (it == server->channel_map.end())
@@ -176,9 +195,10 @@ void Channel::setChannelMode(Client* client, bool mode)
 {
 	if (checkPermission(client) == 1)
 	{
+		client->SendServerToClient(": Mode changed!");
 		this->_inviteOnly = mode;
-		if (this->_inviteOnly == true)
-			this->_limit = _clientAmount;
+		// if (this->_inviteOnly == true)
+		// 	this->_limit = _clientAmount;
 	}
 	else
 		client->SendServerToClient(": No permissions to change mode");
@@ -204,8 +224,10 @@ void Channel::Permissions(Client* admin, Client* client, bool perm)
 	{
 		if (perm == true)
 			it->second = 1;
-		else
+		else {
 			it->second = 0;
+			this->welcomeMsgChan2(it->first);
+		}
 	}
 
 }

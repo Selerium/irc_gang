@@ -10,11 +10,11 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 
 	// authentication check
 	if	(client->isregisterd() == false) {
-		client->SendServerToClient(": " ERROR_451 " :You have not registered");
+		client->SendServerToClient(": " ERROR_451 " localhost JOIN :You have not registered");
 		return ;
 	}
 	if (parse->getParameters().empty() || parameter.size() == 0) {
-		client->SendServerToClient(": " ERROR_461 " :Please enter a valid channel name");
+		client->SendServerToClient(": " ERROR_461 " localhost JOIN :Please enter a valid channel name");
 		return ;
 	}
 
@@ -44,29 +44,29 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 	parse.Debug_msg(":" + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + channelname);
 
 	std::map<int, Channel *>::iterator it;
-	(void)pass;
 
 	for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
 	{
 		if (it->second->getChannelName() == channelname)
 		{
 			if (it->second->getsetLimit() && it->second->_clientAmount == it->second->getLimit()) {
-				client->SendServerToClient(client->getNickname() + " " + channelname + " :Cannot join channel (+l)");
+				client->SendServerToClient(":471 " + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + " " + channelname + " :Cannot join channel (+l)");
 				return ;
 			}
 			if (it->second->getInviteMode() && (!it->second->_clients.find(client)->first || it->second->checkPermission(client) != 2)) {
-				client->SendServerToClient(client->getNickname() + " " + channelname + " :Cannot join channel (+i)");
+				client->SendServerToClient(":473 " + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + " " + channelname + " :Cannot join channel (+i)");
 				return ;
 			}
 			if (it->second->getChannelPassword().length() && it->second->getChannelPassword() != pass) {
-				client->SendServerToClient(client->getNickname() + " " + channelname + " :Cannot join channel (+k)");
+				client->SendServerToClient(":475 " + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + " " + channelname + " :Cannot join channel (+k)");
 				return ;
 			}
 			it->second->addChanneluser(client);
 			if (it->second->_clientAmount == 1)
 				it->second->welcomeMsgChan1(client);
-			else 
+			else if (it->first != 2)
 				it->second->welcomeMsgChan2(client);
+			it->second->sendToall(":" + client->getNickname() +"!" + client->getUsername() + "@localhost JOIN " + channelname + " :");
 		}
 	}
 }
@@ -85,6 +85,7 @@ void IRC::Join::createChannel(std::string channelname, std::string pass, Server*
 		// 	c++;
 	// }
 	server->channel_map.insert(std::make_pair(server->channel_map.size(), new Channel(channelname, pass)));
+
 	(void)client;
 }
 

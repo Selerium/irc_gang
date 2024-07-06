@@ -17,7 +17,7 @@ IRC::Commands::Commands(){
 				commandMap["TOPIC"] = &Commands::topic;
 				commandMap["KICK"] = &Commands::kick;
 				commandMap["INVITE"] = &Commands::invite;
-				commandMap["LEAVE"] = &Commands::leave;
+				commandMap["PART"] = &Commands::part;
 }
 
 IRC::Commands::~Commands(){}
@@ -134,7 +134,7 @@ void IRC::Commands::WelcomeMsg(Client* client)
 	client->SendServerToClient(":irc 004 " + client->getNickname() + " :irc 1.3  itklo");
 }
 
-void IRC::Commands::leave(Parse *parse, Client *client, Server *server) {
+void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 	(void) parse;
 
 	if (!client->isregisterd()) {

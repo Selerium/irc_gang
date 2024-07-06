@@ -56,7 +56,7 @@ public:
         void topic(Parse *parse,Client *client, Server *server);
         void kick(Parse *parse,Client *client, Server *server);
         void invite(Parse *parse,Client *client, Server *server);
-        void leave(Parse *parse,Client *client, Server *server);
+        void part(Parse *parse,Client *client, Server *server);
 
         void executeCommand(Parse *parse, Client *client, Server *server);
 		void WelcomeMsg(Client* client);

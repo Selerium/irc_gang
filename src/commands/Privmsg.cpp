@@ -112,7 +112,6 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			}
 		}
 		return ;
-		// maybe i should choeck for mode
 	}
 	// else if (getReceiver().length() >= 2 && getReceiver()[0] == '%' && getReceiver()[1] == '*')
 	else if (getReceiver().length() && getReceiver()[0] == '$')

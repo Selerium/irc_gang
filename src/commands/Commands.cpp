@@ -37,7 +37,7 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 		if (it != commandMap.end())
 		{
 			(this->*(it->second))(parse,client, server);
-			if ((parse->getParameters()[0] != "QUIT" && parse->getParameters()[0] != "KICK") && client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
+			if ((parse->getCommand() != "QUIT" && parse->getCommand() != "KICK") && client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
 			{
 				WelcomeMsg(client);
 				client->setWelcomeMsg(true);

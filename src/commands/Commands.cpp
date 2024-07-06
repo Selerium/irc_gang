@@ -36,12 +36,12 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 		std::map<std::string, CommandFunction>::iterator it = commandMap.find(toUpperCase(parse->getCommand()));
 		if (it != commandMap.end())
 		{
-			(this->*(it->second))(parse,client, server);
 			if (client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
 			{
 				WelcomeMsg(client);
 				client->setWelcomeMsg(true);
 			}
+			(this->*(it->second))(parse,client, server);
 
 		}
 		else 
@@ -139,13 +139,13 @@ void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 	(void) parse;
 
 	if (!client->isregisterd()) {
-		client->SendServerToClient(":" ERROR_451 " localhost PART :You have not registered");
+		client->SendServerToClient(":irc " ERROR_451 " PART :You have not registered");
 		return ;
 	}
 
 	std::vector<std::string> parameter = parse->getParameters();
-	if (parameter.empty()) {
-		client->SendServerToClient(": " ERROR_431 " localhost PART :Not enough parameters");
+	if (parameter.size() < 2) {
+		client->SendServerToClient(":irc PART :Not enough parameters");
 		return ;
 	}
 
@@ -155,15 +155,21 @@ void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 		reason += (" " + *it);
 	}
 	for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
-		parse->Debug_msg(it->second->getChannelName() + " - " + channelName);
 		if (it->second->getChannelName() == channelName) {
 			if (it->second->_clients.find(client) == it->second->_clients.end()) {
-				client->SendServerToClient(":" ERR_NOTONCHANNEL + client->getNickname() + "!" + client->getUsername() + "@localhost PART #" + channelName + " :You are not in this channel");
+				client->SendServerToClient(":" ERR_NOTONCHANNEL + client->getNickname() + "!" + client->getUsername() + " PART #" + channelName + " :You are not in this channel");
 				return ;
 			}
-			it->second->sendToall(":" + client->getNickname() + " PART " + channelName + " :" + reason);
+			it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " PART " + channelName + " :" + reason);
 			it->second->_clients.erase(client);
 			it->second->_clientAmount--;
+			if (it->second->_clientAmount == 0) {
+				delete it->second;
+				server->channel_map.erase(it->first);
+				return ;
+			}
+			return ;
 		}
 	}
+	client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " PART " + channelName + " :Channel doesn't exist");
 }

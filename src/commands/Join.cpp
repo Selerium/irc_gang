@@ -41,7 +41,7 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* server, Client* client)
 {
 	Parse parse;
-	parse.Debug_msg(client->getNickname() + " joined " + channelname + "!");
+	parse.Debug_msg(":" + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + channelname);
 
 	std::map<int, Channel *>::iterator it;
 	(void)pass;

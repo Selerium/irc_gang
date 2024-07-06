@@ -7,7 +7,7 @@ IRC::Privmsg::~Privmsg(){}
 void IRC::Privmsg::excutePrivmsg(Parse *parse, Client* client, Server* server)
 {
 	if	(client->isregisterd() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
+		client->SendServerToClient(":localhost " ERROR_451 " " + client->getNickname() + " :You have not registered");
 		return ;
 	}
 
@@ -16,7 +16,7 @@ void IRC::Privmsg::excutePrivmsg(Parse *parse, Client* client, Server* server)
 	if (ParseLine(parse, client) == false)
 	{
 		if (getMsg() == "")
-			client->SendServerToClient(": "  ERR_NOTEXTTOSEND  " :" + client->getNickname() + " :No text to send");
+			client->SendServerToClient(":localhost "  ERR_NOTEXTTOSEND  " " + client->getNickname() + " :No text to send");
 		else 
 			checkReceive(server, client);
 	}
@@ -27,15 +27,15 @@ bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
 
     if (parameters.empty())
     {
-        client->SendServerToClient(":" ERR_NORECIPIENT ":" + client->getNickname() + " :No recipient given PRIVMSG");
-        client->SendServerToClient(":" ERR_NOTEXTTOSEND ":" + client->getNickname() + " :No text to send");
+        client->SendServerToClient(":localhost " ERR_NORECIPIENT " " + client->getNickname() + " :No recipient given PRIVMSG");
+        client->SendServerToClient(":localhost " ERR_NOTEXTTOSEND " " + client->getNickname() + " :No text to send");
         return true;
     }
 
     std::string receiver = parameters[0];
     if (receiver[0] == ':')
     {
-        client->SendServerToClient(":" ERR_NORECIPIENT ":" + client->getNickname() + " :No recipient given PRIVMSG");
+        client->SendServerToClient(":localhost " ERR_NORECIPIENT " " + client->getNickname() + " :No recipient given PRIVMSG");
         return true;
     }
 
@@ -54,7 +54,7 @@ bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
             }
             else if ((*it)[0] != ':' && !textFound)
             {
-                client->SendServerToClient(":" ERR_NOTEXTTOSEND ":" + client->getNickname() + " :No text to send");
+                client->SendServerToClient(":localhost " ERR_NOTEXTTOSEND " " + client->getNickname() + " :No text to send");
                 return true;
             }
             setMsg(*it + " ");
@@ -79,9 +79,9 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++)
 				{
-					parse.Debug_msg(it2->first->getNickname());
-					if (it2->second == 1)
-						it2->first->SendServerToClient(getSender() + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
+					parse.Debug_msg("sending message to an operator");
+					if (it2->second == 1 && it2->first->getNickname() != client->getNickname())
+						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;
 			}
@@ -101,7 +101,8 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++) {
 					parse.Debug_msg(it2->first->getNickname());
-					it2->first->SendServerToClient(getSender() + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
+					if (it2->first->getNickname() != client->getNickname())
+						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;
 			}
@@ -113,7 +114,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 	else if (getReceiver().length() && getReceiver()[0] == '$')
 	{
 		parse.Debug_msg("send to everyone");
-		sendToAll(server);
+		sendToAll(server, client);
 		return;
 	}
 	else 
@@ -125,22 +126,23 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 			{
 				if (it->second->getNickname() == getReceiver())
 				{
-					server->clients_map[it->first]->SendServerToClient(getSender() + " PRIVMSG " + getReceiver() + " :" + this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
+					server->clients_map[it->first]->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg); // return (_receiver_fd = it->first); //or return (it->second->getClientFd())
 					return;
 				}
 			}
 		}
 		return ;
 	}
-	client->SendServerToClient(": "  ERR_NOSUCHNICK  " :" + client->getNickname() + "  :No such nick/channel");
+	client->SendServerToClient(":localhost "  ERR_NOSUCHNICK  " " + client->getNickname() + " :No such nick/channel");
 }
 
 
-void IRC::Privmsg::sendToAll(Server* server)
+void IRC::Privmsg::sendToAll(Server* server, Client *client)
 {
 	std::map<int , Client *>::iterator it;
 	for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
-			server->clients_map[it->second->getClientFd()]->SendServerToClient(getSender() + " PRIVMSG $ " +  this->_Msg);
+		if (it->second->getNickname() != client->getNickname())
+			server->clients_map[it->second->getClientFd()]->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@" + "localhost PRIVMSG $ :" + this->_Msg);
 }
 
 void IRC::Privmsg::setReceiver(std::string str){ this->_receiver = str;}

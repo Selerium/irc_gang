@@ -17,7 +17,7 @@ IRC::Commands::Commands(){
 				commandMap["TOPIC"] = &Commands::topic;
 				commandMap["KICK"] = &Commands::kick;
 				commandMap["INVITE"] = &Commands::invite;
-				commandMap["LEAVE"] = &Commands::leave;
+				commandMap["PART"] = &Commands::part;
 }
 
 IRC::Commands::~Commands(){}
@@ -46,8 +46,10 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 		}
 		else 
 		{
-			//unknown command
-			client->SendServerToClient(": 421 " + parse->getCommand() + ERROR_421);
+			if (parse->getCommand().find("PASS") != std::string::npos) {
+				this->pass(parse, client, server);
+			}
+			client->SendServerToClient(":localhost 421 " + parse->getCommand() + ERROR_421);
 		}
 		parse->_messages.erase(parse->_messages.begin());
 	}
@@ -133,7 +135,7 @@ void IRC::Commands::WelcomeMsg(Client* client)
 	client->SendServerToClient(":irc 004 " + client->getNickname() + " :irc 1.3  itklo");
 }
 
-void IRC::Commands::leave(Parse *parse, Client *client, Server *server) {
+void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 	(void) parse;
 
 	if (!client->isregisterd()) {

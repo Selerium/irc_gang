@@ -188,7 +188,7 @@ public:
            void excutePrivmsg(Parse *parse, Client* client, Server* server);
 		   bool ParseLine(Parse *parse, Client* client);
 		   void checkReceive(Server* server, Client* client);
-		   void sendToAll(Server* server);
+		   void sendToAll(Server* server, Client *client);
 
 		   void setReceiver(std::string str);
 		   void setMsg(std::string str);

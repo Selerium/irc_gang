@@ -79,8 +79,8 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++)
 				{
-					parse.Debug_msg(it2->first->getNickname());
-					if (it2->second == 1)
+					parse.Debug_msg("sending message to an operator");
+					if (it2->second == 1 && it2->first->getNickname() != client->getNickname())
 						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;
@@ -101,7 +101,8 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 				std::map<Client *, int>::iterator it2;
 				for(it2 = it->second->_clients.begin(); it2 != it->second->_clients.end(); it2++) {
 					parse.Debug_msg(it2->first->getNickname());
-					it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
+					if (it2->first->getNickname() != client->getNickname())
+						it2->first->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@localhost" + " PRIVMSG " + getReceiver() + " :" + this->_Msg);
 				}
 				return;
 			}
@@ -113,7 +114,7 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 	else if (getReceiver().length() && getReceiver()[0] == '$')
 	{
 		parse.Debug_msg("send to everyone");
-		sendToAll(server);
+		sendToAll(server, client);
 		return;
 	}
 	else 
@@ -136,11 +137,12 @@ void IRC::Privmsg::checkReceive(Server* server, Client* client)
 }
 
 
-void IRC::Privmsg::sendToAll(Server* server)
+void IRC::Privmsg::sendToAll(Server* server, Client *client)
 {
 	std::map<int , Client *>::iterator it;
 	for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
-			server->clients_map[it->second->getClientFd()]->SendServerToClient(":localhost  PRIVMSG $ :" + this->_Msg);
+		if (it->second->getNickname() != client->getNickname())
+			server->clients_map[it->second->getClientFd()]->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + "@" + "localhost PRIVMSG $ :" + this->_Msg);
 }
 
 void IRC::Privmsg::setReceiver(std::string str){ this->_receiver = str;}

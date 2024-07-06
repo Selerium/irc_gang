@@ -50,18 +50,18 @@ void Parse::printcommandinfo()
 {
     std::vector<std::pair<std::string, std::vector<std::string> > >::iterator it;
     std::vector<std::string>::iterator it2;
-	// int i = 0;
+	int i = 0;
 	std::cout << BLUE << "-----------> command info <-------------" << RESET << std::endl;
-    // for (it = _messages.begin(); it != _messages.end(); ++it)
-    // {
-    //     std::cout << "Command: " << it->first << std::endl;
-	// 	i = 0;
-    //     for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-    //     {
-    //         std::cout << "Parameter "<< i << ": "<< *it2 << std::endl;
-	// 		i++;
-    //     }
-    // }
+    for (it = _messages.begin(); it != _messages.end(); ++it)
+    {
+        std::cout << "Command: " << it->first << std::endl;
+		i = 0;
+        for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+        {
+            std::cout << "Parameter "<< i << ": "<< *it2 << std::endl;
+			i++;
+        }
+    }
 	std::cout << BLUE << "-------------------------------------" << RESET << std::endl;
 
 }

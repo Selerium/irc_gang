@@ -66,9 +66,10 @@ void IRC::Kick::checkChannel(Client* client, Server* server)
 					{
 						if (it->second->FindClient(setkickNick) != NULL)
 						{
-							it->second->FindClient(setkickNick)->SendServerToClient("You were kicked by " + client->getNickname() + " (Reason:  " + comment + ")");
-							it->second->sendToall(setkickNick + " was kicked by " + client->getNickname() + " (Reason:  " + comment + ")\r\n");
-							it->second->removeNick(it->second->FindClient(setkickNick), setkickNick);
+							// it->second->FindClient(setkickNick)->SendServerToClient("You were kicked by " + client->getNickname() + " (Reason:  " + comment + ")");
+							it->second->sendToall(":" + client->getHostname() + " KICK " + it->second->getChannelName() + " " + setkickNick + " :" + comment);
+							it->second->removeNick(client, setkickNick);
+							return ;
 						}
 						else
 							client->SendServerToClient(client->getNickname() + " " + setkickNick + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");

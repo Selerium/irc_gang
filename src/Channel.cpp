@@ -120,9 +120,12 @@ void Channel::removeNick(Client* client, std::string nick)
 	if (checkPermission(client) != 1)
 		client->SendServerToClient("NO PERMISSIONS");
 	std::map<Client *, int>::iterator it;
-	it = this->_clients.find(client);
-	if (it->first->getNickname() == nick)
-		this->_clients.erase(it->first);
+	// it = this->_clients.find(client);
+	// if (it->first->getNickname() == nick)
+	// 	this->_clients.erase(it->first);
+	if(this->FindClient(nick)) {
+		this->_clients.erase(this->FindClient(nick));
+	}
 }
 
 

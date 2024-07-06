@@ -66,7 +66,7 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 				it->second->welcomeMsgChan1(client);
 			else if (it->first != 2)
 				it->second->welcomeMsgChan2(client);
-			// it->second->sendToall(":" + client->getNickname() +"!" + client->getUsername() + "@localhost JOIN " + channelname.substr(1) + " :");
+			// it->second->sendToall(":" + client->getNickname() +"!" + client->getUsername() + "@localhost JOIN " + channelname);
 		}
 	}
 }

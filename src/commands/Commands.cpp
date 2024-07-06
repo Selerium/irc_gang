@@ -150,16 +150,20 @@ void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 	}
 
 	std::string channelName = parameter[0];
+	std::string reason = parameter[1];
+	for (std::vector<std::string>::iterator it = parameter.begin() + 2; it != parameter.end(); it++) {
+		reason += (" " + *it);
+	}
 	for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
-		if (it->second->getChannelName().substr(1) == channelName) {
+		parse->Debug_msg(it->second->getChannelName() + " - " + channelName);
+		if (it->second->getChannelName() == channelName) {
 			if (it->second->_clients.find(client) == it->second->_clients.end()) {
 				client->SendServerToClient(":" ERR_NOTONCHANNEL + client->getNickname() + "!" + client->getUsername() + "@localhost PART #" + channelName + " :You are not in this channel");
 				return ;
 			}
+			it->second->sendToall(":" + client->getNickname() + " PART " + channelName + " :" + reason);
 			it->second->_clients.erase(client);
 			it->second->_clientAmount--;
-			client->SendServerToClient(": " + client->getNickname() + "!" + client->getUsername() + "@localhost PART #" + channelName + " :Left channel");
-			it->second->sendToall(":" + client->getNickname() + " PART #" + channelName + " :leaving");
 		}
 	}
 }

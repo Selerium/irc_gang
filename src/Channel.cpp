@@ -137,9 +137,10 @@ int Channel::checkPermission(Client* client)
 void Channel::welcomeMsgChan1(Client* client)
 {
 	client->SendServerToClient("Successfully joined channel: [" + getChannelName() + "] as a operator.\r\n");
-	client->SendServerToClient(":" + client->getNickname() + " JOIN #"
+	client->SendServerToClient(":" + client->getNickname() + " JOIN "
 							+ getChannelName() + "\r\n");
-	sendToall(":" + client->getNickname() + " JOIN #" + getChannelName() + "\r\n");
+
+	sendToall(":" + client->getNickname() + " JOIN " + getChannelName() + "\r\n");
 	client->SendServerToClient( ": 353 " + client->getNickname() + " = " + getChannelName() + " :@" + client->getNickname() + "\r\n");
 	client->SendServerToClient( ": 366 " + client->getNickname() + " " + getChannelName() + " :End of /NAMES list\r\n");
 	if (getTopic() != "")
@@ -149,19 +150,21 @@ void Channel::welcomeMsgChan1(Client* client)
 void Channel::welcomeMsgChan2(Client* client)
 {
 	client->SendServerToClient("Successfully joined channel: [" + getChannelName() + "] as a memebr.\r\n");
-	(":" + client->getNickname() + " JOIN #"
+	(":" + client->getNickname() + " JOIN "
 							+ getChannelName() + "\r\n");
-	sendToall(":" + client->getNickname() + " JOIN #" + getChannelName() + "\r\n");
-
-	client->SendServerToClient( ": 353 " + client->getNickname() + " = " + getChannelName() + " :");
+	sendToall(":" + client->getNickname() + " JOIN " + getChannelName() + "\r\n");
 
 	std::map<Client *, int>::iterator it;
+	std::string clients_name;
 	for(it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
 		if (it->second == 0)
-			it->first->SendServerToClient(it->first->getNickname() + " ");
+			clients_name += it->first->getNickname() + " ";
 		else if (it->second == 1)
-			it->first->SendServerToClient("@" + it->first->getNickname() + " ");
-	client->SendServerToClient( "\r\n");
+			clients_name += "@" + it->first->getNickname() + " ";
+	}
+	client->SendServerToClient( ": 353 " + client->getNickname() + " = " + getChannelName() + " :" + clients_name + "\r\n");
+
 	client->SendServerToClient( ": 366 " + client->getNickname() + " " + getChannelName() + " :End of /NAMES list\r\n");
 	if (getTopic() != "")
 		client->SendServerToClient( ": 332 " + client->getNickname()+ " " + getChannelName() + " :" + getTopic() + "\r\n");

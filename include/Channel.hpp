@@ -55,7 +55,6 @@ class Channel
 		void welcomeMsgChan1(Client* client);
 		void welcomeMsgChan2(Client* client);
 
-
 //MODESTUFF
 		void removeLimit(Client* client);
 		void setLimiter(Client* client, int amount);

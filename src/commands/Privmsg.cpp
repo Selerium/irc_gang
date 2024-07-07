@@ -1,5 +1,26 @@
 #include "../../include/IRC.hpp"
 
+std::string ourbot()
+{
+	std::srand(std::time(0));
+
+	std::vector<std::string> messages;
+    messages.push_back("Hello, world!");
+    messages.push_back("How are you?");
+    messages.push_back("Good morning!");
+    messages.push_back("Good night!");
+    messages.push_back("Have a great day!");
+    messages.push_back("Keep up the good work!");
+    messages.push_back("Stay positive!");
+    messages.push_back("You're doing great!");
+    messages.push_back("Believe in yourself!");
+    messages.push_back("Take care!");
+
+		int randomIndex = std::rand() % messages.size();
+		return (messages[randomIndex]);
+}
+
+
 IRC::Privmsg::Privmsg() : _receiver("") , _Msg(""){} 
 
 IRC::Privmsg::~Privmsg(){}
@@ -18,7 +39,15 @@ void IRC::Privmsg::excutePrivmsg(Parse *parse, Client* client, Server* server)
 		if (getMsg() == "")
 			client->SendServerToClient(":localhost "  ERR_NOTEXTTOSEND  " " + client->getNickname() + " :No text to send");
 		else 
-			checkReceive(server, client);
+		{
+			if (getReceiver() == "bot")
+			{
+				client->SendServerToClient(":bot!bot PRIVMSG " + client->getNickname() + " :" + ourbot()); 
+				return;
+			}
+			else 
+				checkReceive(server, client);
+		}
 	}
 }
 bool IRC::Privmsg::ParseLine(Parse *parse, Client* client)
@@ -156,7 +185,6 @@ void IRC::Privmsg::setSender(std::string str){this->_Sender += str;}
 std::string IRC::Privmsg::getReceiver(){return _receiver;}
 std::string IRC::Privmsg::getMsg(){return _Msg;}
 std::string IRC::Privmsg::getSender(){return _Sender;}
-
 
 
 /*     Command: PRIVMSG

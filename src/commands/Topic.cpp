@@ -20,8 +20,7 @@ int IRC::Topic::parseMsg(Parse *parse, Client* client)
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty() || parameters[0][0] == ':')
 	{
-		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-		+ " TOPIC " ":Not enough parameters");
+		client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NEEDMOREPARAMS " TOPIC :Not enough parameters");
 		return 1;
 	}
 
@@ -40,8 +39,7 @@ int IRC::Topic::parseMsg(Parse *parse, Client* client)
 			}
 			else if (!textFound && (*it)[0] != ':')
 			{
-				client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() 
-				+ " TOPIC " ":Not enough parameters");
+				client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NEEDMOREPARAMS " TOPIC :Not enough parameters");
 				return 1;
 			}
 			topic += (*it + " ");
@@ -62,25 +60,21 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 				if (it->second->FindClient(client->getNickname()) != NULL)
 				{
 					// add condition depending on Topic permissions:
-					if (it->second->getTopicMode() && it->second->_clients.find(client)->second == 0)
+					if (it->second->getTopicMode() && it->second->_clients.find(client)->second == 0 && topic.size())
 					{
-						client->SendServerToClient(": " ERR_CHANOPRIVSNEEDED " " + client->getNickname() + " " + setChannel
-							+ " :You're not channel operator");
+						client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " + ERR_CHANOPRIVSNEEDED " TOPIC " + setChannel + " :You're not channel operator");
 						return;
 					}
 					if (topic == "")
 					{
 						if (it->second->getTopic() == "") {
-							client->SendServerToClient(": " RPL_NOTOPIC " " + client->getNickname() + " " + setChannel
-							+ " :No topic is set");
+							client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " RPL_NOTOPIC " TOPIC " + setChannel + " :No topic is set");
 							return ;
 						}
 						else 
 							it->second->setwhosetTopic(client->getNickname());
-						client->SendServerToClient(": " RPL_TOPIC " " + client->getNickname() 
-							+ " " + setChannel + " :" + it->second->getTopic());
-						client->SendServerToClient(": " RPL_TOPICWHOTIME " " + client->getNickname() 
-						+ " " + setChannel + " :" + it->second->getwhosetTopic());
+						client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " RPL_TOPIC " TOPIC " + setChannel + " :" + it->second->getTopic());
+						// client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " RPL_TOPICWHOTIME " TOPIC " + setChannel + " :" + it->second->getwhosetTopic());
 						return;
 					}
 					else if (topic[0] ==  ':' || topic[0] == ' ') {
@@ -100,8 +94,7 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 			}
 		}
 	}
-	client->SendServerToClient(": " ERR_NOSUCHCHANNEL " " + client->getNickname() + " " 
-	+ setChannel + " :No such channel");
+	client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NOSUCHCHANNEL " TOPIC " + setChannel + " :No such channel");
 	return;
 }
 /*

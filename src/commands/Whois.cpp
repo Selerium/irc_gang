@@ -22,26 +22,19 @@ void IRC::Whois::excuteWhois(Parse *parse, Client* client, Server* server)
 				parse->Debug_msg(parse->getParameters()[0]);
 				if (it->second->getNickname() == parse->getParameters()[0] && it->second->isregisterd() == true)
 				{
-						client->SendServerToClient(": " ERR_NOSUCHNICK " "  
-						+ client->getNickname() +  " " + parse->getParameters()[0] 
-						+ " :has identified for this nick");
+						client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NOSUCHNICK " WHOIS " + parse->getParameters()[0] + " :has identified for this nick");
 
-						client->SendServerToClient(": " RPL_WHOISUSER " "  
-						+ client->getNickname() +  " " + it->second->getNickname() + " " + it->second->getUsername()
-						+ " " + it->second->getHostname()
-						+ " * :" + it->second->getUsername() + "");
+						client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " RPL_WHOISUSER " WHOIS " + it->second->getNickname() + " " + it->second->getUsername() + " " + it->second->getHostname() + " * :" + it->second->getUsername());
 
-						client->SendServerToClient(": " RPL_ENDOFWHOIS " "  
-						+ client->getNickname() +  " " + it->second->getNickname()
-						+ " :End of /WHOIS list");
+						client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " RPL_ENDOFWHOIS " WHOIS " + client->getNickname() +  " " + it->second->getNickname() + " :End of /WHOIS list");
 						return;
 				}
 			}
 		}
-		client->SendServerToClient( ": " ERR_NOSUCHNICK " " +  client->getNickname() +  " " + parse->getParameters()[0] + " :No such nick/channel"); 
+		client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NOSUCHNICK " " +  client->getNickname() +  " " + parse->getParameters()[0] + " :No such nick/channel"); 
 	}
 	else
-		client->SendServerToClient( ": " ERR_NONICKNAMEGIVEN " " +  client->getNickname() + " :No nickname given");
+		client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NONICKNAMEGIVEN " " +  client->getNickname() + " :No nickname given");
 
 }
 

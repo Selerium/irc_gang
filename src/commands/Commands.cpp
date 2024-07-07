@@ -37,7 +37,7 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 		if (it != commandMap.end())
 		{
 			(this->*(it->second))(parse,client, server);
-			if ((parse->getCommand() != "QUIT" && parse->getCommand() != "KICK") && client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
+			if ((toUpperCase(parse->getCommand()) != "QUIT" && toUpperCase(parse->getCommand()) != "KICK") && client->getWelcomeMsg() == false && client->getAuthantication() == true && client->isregisterd() == true)
 			{
 				WelcomeMsg(client);
 				client->setWelcomeMsg(true);
@@ -48,7 +48,7 @@ void IRC::Commands::executeCommand(Parse *parse ,Client* client, Server* server)
 			if (parse->getCommand().find("PASS") != std::string::npos) {
 				this->pass(parse, client, server);
 			}
-			client->SendServerToClient(":localhost 421 " + parse->getCommand() + ERROR_421);
+			client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " 421 " + parse->getCommand() + ERROR_421);
 		}
 		parse->_messages.erase(parse->_messages.begin());
 	}
@@ -156,7 +156,7 @@ void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 	for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
 		if (it->second->getChannelName() == channelName) {
 			if (it->second->_clients.find(client) == it->second->_clients.end()) {
-				client->SendServerToClient(":" ERR_NOTONCHANNEL + client->getNickname() + "!" + client->getUsername() + " PART #" + channelName + " :You are not in this channel");
+				client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NOTONCHANNEL " PART " + channelName + " :You are not in this channel");
 				return ;
 			}
 			it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " PART " + channelName + " :" + reason);

@@ -8,13 +8,13 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 {
 	std::vector<std::string> parameter = parse->getParameters();
 
-	// authentication check
+	// authentication checkKW
 	if	(client->isregisterd() == false) {
-		client->SendServerToClient(": " ERROR_451 " localhost JOIN :You have not registered");
+		client->SendServerToClient(": " ERROR_451 " JOIN :You have not registered");
 		return ;
 	}
 	if (parse->getParameters().empty() || parameter.size() == 0 || (parameter[0].size() && (parameter[0][0] != '#'))) {
-		client->SendServerToClient(": " ERROR_461 " localhost JOIN :Please enter a valid channel name");
+		client->SendServerToClient(": " ERROR_461 " JOIN :Please enter a valid channel name");
 		return ;
 	}
 
@@ -51,7 +51,7 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 			joinChannel(parameter[0], parameter[1], server, client);
 		}
 		else if (channelExist(parameter[0], server) == true && channelPass(parameter[0], parameter[1], server) == false)
-			client->SendServerToClient(ERROR_475);
+			client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " 475 JOIN " + parameter[0] + " " + parameter[1] + " :Cannot join channel (+k)");
 		else if (channelExist(parameter[0], server) == true && channelPass(parameter[0], parameter[1], server) == true)
 			joinChannel(parameter[0], parameter[1], server, client);
 
@@ -84,7 +84,7 @@ void IRC::Join::joinChannel(std::string channelname, std::string pass, Server* s
 				return ;
 			}
 			if (it->second->getChannelPassword().length() && it->second->getChannelPassword() != pass) {
-				client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " 475 JOIN " + channelname + " :Cannot join channel (+k)");
+				client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " 475 JOIN " + channelname + " " + pass + " :Cannot join channel (+k)");
 				return ;
 			}
 			it->second->addChanneluser(client);

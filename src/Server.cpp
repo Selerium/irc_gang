@@ -139,37 +139,16 @@ void Server::read_message(int fd, Parse *parse)
 	client_msg = "";
 	char buffer[1024];
 	ssize_t num_bytes = recv(pfds[fd].fd, buffer, sizeof(buffer), 0);
+
 	if (num_bytes == 0)
-	{
-		// Connection closed by the client
-		// Remove the client socket from the array
-		close(pfds[fd].fd);
-		for (int j = fd; j < num_fd; ++j)
-			pfds[j] = pfds[j + 1];
-		num_fd--;
-
-		Client * client = clients_map.find(fd)->second;
-
-		std::cout << "bye bye" << std::endl;
-
-		if (!this->channel_map.empty()) {
-		for (std::map<int, Channel *>::iterator it = this->channel_map.begin(); it != this->channel_map.end(); it++) {
-			if (client && it->second && it->second->FindClient(client->getNickname()))
-				it->second->sendToall(client->getNickname() + "!" + client->getUsername() + " QUIT : Disconnected from client");
-		}
-		clients_map.erase(this->client_sockfd);
-	}
-	}
+		client_msg = "QUIT :leaving\r\n";
 	else
-	{
-		// buffer[num_bytes] = '\0';
 		client_msg += buffer;
-		memset(buffer, 0, sizeof(buffer));
-		parse->getCommandInfo(client_msg, clients_map[this->client_sockfd]);
-		parse->printcommandinfo();
-		IRC::Commands().executeCommand(parse,clients_map[this->client_sockfd], this);
-	}
-	// printClients();
+	memset(buffer, 0, sizeof(buffer));
+	parse->getCommandInfo(client_msg, clients_map[this->client_sockfd]);
+	parse->printcommandinfo();
+	IRC::Commands().executeCommand(parse,clients_map[this->client_sockfd], this);
+
 	parse->_messages.clear();
 }
 

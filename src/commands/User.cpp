@@ -9,7 +9,7 @@ void IRC::User::excuteUser(Parse *parse, Client* client, Server* server)
 	(void)server;
 
 	if (!client->getAuthantication())
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
+		client->SendServerToClient(" : " ERROR_451 " :You have not registered");
 	else
 	{
 		if (client->UserSet == false)

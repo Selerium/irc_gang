@@ -11,7 +11,7 @@ void IRC::Ping::excutePing(Parse *parse, Client* client, Server* server)
 	std::string uniqueToken = "";
 
 	if (client->isregisterd() == false) {
-		client->SendServerToClient(" : " ERROR_451 " " + client->getNickname() + " :You have not registered");
+		client->SendServerToClient(" : " ERROR_451 " :You have not registered");
 		return ;
 	}
 

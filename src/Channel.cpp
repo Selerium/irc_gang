@@ -152,7 +152,7 @@ void Channel::welcomeMsgChan2(Client* client)
 
 	std::string clients_name;
 
-	this->sendToall(":" + client->getNickname() + " JOIN " + getChannelName() + " * :" + client->getNickname());
+	this->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " JOIN " + getChannelName() + " * :" + client->getNickname());
 	if (getTopic() != "")
 		client->SendServerToClient( ":irc 332 " + client->getNickname()+ " " + getChannelName() + " :" + getTopic());
 	for(it = this->_clients.begin(); it != this->_clients.end(); it++)

@@ -21,7 +21,7 @@ int IRC::Invite::parseMsg(Parse *parse, Client* client)
 	std::vector<std::string> parameters = parse->getParameters();
 	if (parameters.empty() || parameters.size() < 2)
 	{
-		client->SendServerToClient(": " ERR_NEEDMOREPARAMS " " + client->getNickname() + "!" + client->getUsername() + " INVITE :Not enough parameters");
+		client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " ERR_NEEDMOREPARAMS " INVITE :Not enough parameters");
 		return 1;
 	}
 	setInviteNick = parameters[0];

@@ -19,9 +19,9 @@ void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server)
 	client->SendServerToClient("ERROR :");
 
 	//remove client from pfds array and closed pfd fd
-	struct pollfd *tmp = new struct pollfd[server->getNumFds() - 1];
+	struct pollfd *tmp = new struct pollfd[server->getFdSize()];
 	bool found = false;
-	for (int i = 0; i < server->getNumFds(); i++) {
+	for (int i = 0; i < server->getNumFds() - 1; i++) {
 		if (server->pfds[i].fd == client->getClientFd()) {
 			close(server->pfds[i].fd);
 			found = true;
@@ -33,6 +33,8 @@ void IRC::Quit::excuteQuit(Parse *parse, Client* client, Server* server)
 				tmp[i] = server->pfds[i];
 		}
 	}
+	if (!found)
+		close(server->pfds[server->getNumFds() - 1].fd);
 	delete[] server->pfds;
 	server->pfds = tmp;
 	server->setNumFds(server->getNumFds() - 1);

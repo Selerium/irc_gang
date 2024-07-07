@@ -1,4 +1,5 @@
 #include "../../include/IRC.hpp"
+#include <asm-generic/errno.h>
 
 IRC::Mode::Mode(){}
 
@@ -14,31 +15,32 @@ std::string print_num(int num) {
 void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 {
 	if	(client->isregisterd() == false) {
-		client->SendServerToClient(client->getNickname() + " :" + ERROR_451 + " You have not registered");
+		client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " + ERROR_451 + " MODE :You have not registered");
 		return ;
 	}
 
-	if (parse->getParameters().empty()) {
-		client->SendServerToClient(client->getNickname() + " " +"MODE :" + ERROR_461 + " Not enough parameters");
+	if (parse->getParameters().size() == 0) {
+		client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " " + ERROR_461 + " MODE :Not enough parameters");
 		return ;
 	}
 
 	std::vector<std::string> parameter = parse->getParameters();
 	std::string channelname;
 	if (parameter.size() > 1) {
-		parse->Debug_msg("help");
 		channelname = '#' + parameter[0];
 	}
 	else {
 		channelname = parameter[0];
-		parse->Debug_msg("helpppp");
 	}
+
 	if (server->channel_map.empty())
 	{
 		if (checkUser(server, channelname, client, parse) == 0)
-			client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
+			client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " 403 MODE :channel doesnt exist");
 		return;
 	}
+
+	parse->Debug_msg("hellppppp");
 
 	std::map<int, Channel *>::iterator it;
 	for(it = server->channel_map.begin(); it != server->channel_map.end(); it++)
@@ -88,26 +90,32 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					int num = std::atoi(parameter[2].c_str());
 					it->second->setLimiter(client, num, parameter[2]);
 				}
+				else {
+					client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " :Wrong number of arguments");
+				}
 			}
 			else if (parameter[1] == "-L" || parameter[1] == "-l") {
 				it->second->removeLimit(client);
 			}
 			else if (parameter[1] == "+K" || parameter[1] == "+k")
 			{
-				it->second->setPass(client, parameter[2]);
+				if (parameter.size() == 3) {
+					it->second->setPass(client, parameter[2]);
+				}
+				else {
+					client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " :Wrong number of arguments");
+				}
 			}
 			else if (parameter[1] == "-K" || parameter[1] == "-k") {
 				it->second->removePass(client);
 			}
 			else if (parameter[1] == "+I" || parameter[1] == "+i")
 			{
-				if (parameter.size() == 2)
-					it->second->setChannelMode(client, true);
+				it->second->setChannelMode(client, true);
 			}
 			else if (parameter[1] == "-I" || parameter[1] == "-i")
 			{
-				if (parameter.size() == 2)
-					it->second->setChannelMode(client, false);
+				it->second->setChannelMode(client, false);
 			}
 			else if (parameter[1] == "+O" || parameter[1] == "+o")
 			{
@@ -115,32 +123,36 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
 					return ;
 				}
-				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
+				if (parameter.size() == 3)
 				{
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), true, parameter[2]);
+				}
+				else {
+					client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " :Wrong number of arguments");
 				}
 			}
 			else if (parameter[1] == "-O" || parameter[1] == "-o")
 			{
-				if (!it->second->FindClient(parameter[2])) {
-					client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
-					return ;
-				}
-				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
+				if (parameter.size() == 3) {
+					if (!it->second->FindClient(parameter[2])) {
+						client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
+						return ;
+					}
 					it->second->Permissions(client, it->second->FindClient(parameter[2]), false, parameter[2]);
+				}
+				else
+					client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " :Wrong number of arguments");
 			}
 			else if (parameter[1] == "+T" || parameter[1] == "+t")
 			{
-				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
-					it->second->SetTopicMode(client, true);
+				it->second->SetTopicMode(client, true);
 			}
 			else if (parameter[1] == "-T" || parameter[1] == "-t")
 			{
-				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
-					it->second->SetTopicMode(client, false);
+				it->second->SetTopicMode(client, false);
 			}
 			else {
-				client->SendServerToClient(client->getNickname() + " " + parameter[1] + " :is unknown mode char to me");
+				client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + parameter[1] + " :is unknown mode char to me");
 			}
 			return ;
 		}
@@ -148,7 +160,7 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 	if (it == server->channel_map.end())
 	{
 		if (checkUser(server, channelname, client, parse) == 0)
-			client->SendServerToClient(client->getNickname() + " " + channelname + " : 403 channel doesnt exist");
+			client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " 403 MODE " + channelname + " :channel doesnt exist");
 	}
 	(void)parse;
 }
@@ -156,19 +168,21 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 int IRC::Mode::checkUser(Server* server, std::string name, Client* client, Parse* parse)
 {
 	(void)name;
+	(void)client;
 	std::map<int , Client *>::iterator it;
 	if (!server->clients_map.empty())
 	{
-		for (it = server->clients_map.begin(); it != server->clients_map.end() ;++it)
+		for (it = server->clients_map.begin(); it != server->clients_map.end(); it++)
 		{
+			parse->Debug_msg(it->second->getNickname() + " _ " + parse->getParameters()[0]);
 			if (it->second->getNickname() == parse->getParameters()[0] && parse->getParameters()[1].empty() == true)
 			{
-				client->SendServerToClient(":" + parse->getParameters()[0] + " MODE " + parse->getParameters()[0] + " :+i\r\n");
+				it->second->SendServerToClient(":" + it->second->getNickname() + "!" + it->second->getUsername() + " MODE " + parse->getParameters()[0] + " :+i");
 				return 1;
 			}
 			else if (it->second->getNickname() == parse->getParameters()[0] && parse->getParameters()[1].empty() == false)
 			{
-				client->SendServerToClient(":" + parse->getParameters()[0] + " MODE " + parse->getParameters()[0] + " :" + parse->getParameters()[1] + "\r\n");
+				it->second->SendServerToClient(":" + it->second->getNickname() + "!" + it->second->getUsername() + " MODE " + parse->getParameters()[0] + " :" + parse->getParameters()[1]);
 				return 1;
 			}
 		}

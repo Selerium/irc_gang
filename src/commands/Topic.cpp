@@ -83,15 +83,18 @@ void IRC::Topic::checkChannel(Client* client, Server* server)
 						+ " " + setChannel + " :" + it->second->getwhosetTopic());
 						return;
 					}
-					else if (topic ==  " ")
+					else if (topic[0] ==  ':' || topic[0] == ' ') {
 						it->second->setTopic(client, "");
+						it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " 332 TOPIC #" + setChannel);
+						return ;
+					}
 					else
 						it->second->setTopic(client, topic);
-					it->second->sendToall( client->getNickname() + " changed the topic of " + setChannel + " to :" +  it->second->getTopic());
+					it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " 332 TOPIC #" + setChannel + " :" +  it->second->getTopic());
 					return ;
 				}
 				else {
-					client->SendServerToClient(client->getNickname() + " " + setChannel + " :442 You're not on that channel");
+					client->SendServerToClient(":" + client->getNickname() + "!" + client->getUsername() + " 442 TOPIC #" + setChannel + " :You're not on that channel");
 					return ;
 				}
 			}

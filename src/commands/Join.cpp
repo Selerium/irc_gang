@@ -13,7 +13,7 @@ void IRC::Join::excuteJoin(Parse *parse, Client* client, Server* server)
 		client->SendServerToClient(": " ERROR_451 " localhost JOIN :You have not registered");
 		return ;
 	}
-	if (parse->getParameters().empty() || parameter.size() == 0) {
+	if (parse->getParameters().empty() || parameter.size() == 0 || (parameter[0].size() && parameter[0][0] != '#')) {
 		client->SendServerToClient(": " ERROR_461 " localhost JOIN :Please enter a valid channel name");
 		return ;
 	}

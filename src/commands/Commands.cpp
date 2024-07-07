@@ -143,15 +143,20 @@ void IRC::Commands::part(Parse *parse, Client *client, Server *server) {
 	}
 
 	std::vector<std::string> parameter = parse->getParameters();
-	if (parameter.size() < 2) {
+	if (parameter.size() < 1) {
 		client->SendServerToClient(":irc PART :Not enough parameters");
 		return ;
 	}
 
 	std::string channelName = parameter[0];
-	std::string reason = parameter[1];
-	for (std::vector<std::string>::iterator it = parameter.begin() + 2; it != parameter.end(); it++) {
-		reason += (" " + *it);
+	std::string reason;
+	if (parameter.size() == 1)
+		reason = "leaving";
+	else {
+		reason = parameter[1];
+		for (std::vector<std::string>::iterator it = parameter.begin() + 2; it != parameter.end(); it++) {
+			reason += (" " + *it);
+		}
 	}
 	for (std::map<int, Channel *>::iterator it = server->channel_map.begin(); it != server->channel_map.end(); it++) {
 		if (it->second->getChannelName() == channelName) {

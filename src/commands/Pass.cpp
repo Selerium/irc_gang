@@ -12,7 +12,6 @@ void IRC::Pass::excutePass(Parse *parse,Client* client, Server* server)
 	{
 		client->SendServerToClient(":" ERROR_461 " Not enough parameters");
 		
-
 		return;
 	}
 	else

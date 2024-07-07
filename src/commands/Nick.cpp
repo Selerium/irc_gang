@@ -50,7 +50,8 @@ void	IRC::Nick::excuteNick(Parse *parse, Client* client, Server* server)
 	{
 		std::string oldnick = client->getNickname();
 		client->setNickname(parameter[0]);
-		oldnick = oldnick + " NICK " + parameter[0];
+		//new change
+		oldnick = ":" + oldnick + " NICK " + parameter[0];
 		client->SendServerToClient(oldnick);
 	}
 }

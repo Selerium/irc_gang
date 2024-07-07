@@ -7,7 +7,7 @@ IRC::Invite::~Invite(){}
 void IRC::Invite::excuteInvite(Parse *parse, Client* client, Server* server)
 {
 	if	(client->isregisterd() == false) {
-		client->SendServerToClient(": " ERROR_451 " localhost INVITE :You have not registered");
+		client->SendServerToClient(": " ERROR_451 " INVITE :You have not registered");
 		return ;
 	}
 
@@ -56,10 +56,12 @@ void IRC::Invite::checkChannel(Client* client, Server* server)
 						else {
 							for (std::map<int, Client *>::iterator it2 = server->clients_map.begin(); it2 != server->clients_map.end(); it2++) {
 								if (it2->second->getNickname() == setInviteNick) {
-									it2->second->SendServerToClient(": " + client->getNickname() + "!" + client->getUsername() + " INVITE " + setInviteNick +  " " + setChannel + ":");
+									// it2->second->SendServerToClient(": " + client->getNickname() + "!" + client->getUsername() + " INVITE " + setInviteNick +  " " + setChannel);
 									it->second->_clients.insert(std::make_pair(it2->second, 2));
+									it->second->_clientAmount++;
 								}
 							}
+							client->SendServerToClient(": 341 " + client->getNickname() + " " + setInviteNick + " " + setChannel);
 						}
 						return ;
 					}

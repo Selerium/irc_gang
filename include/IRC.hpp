@@ -137,6 +137,7 @@ public:
         public:
             Mode();
             ~Mode();
+            std::string parameter2;
            void excuteMode(Parse *parse, Client* client, Server* server);
            int checkUser(Server* server, std::string name, Client* client, Parse* parse);
     };

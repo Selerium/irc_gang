@@ -57,11 +57,11 @@ class Channel
 
 //MODESTUFF
 		void removeLimit(Client* client);
-		void setLimiter(Client* client, int amount);
+		void setLimiter(Client* client, int amount, std::string str);
 		void setPass(Client* client, std::string str);
 		void removePass(Client* client);
 		void setChannelMode(Client* client, bool mode);
-		void Permissions(Client* admin, Client* client, bool perm);
+		void Permissions(Client* admin, Client* client, bool perm, std::string str);
 		void SetTopicMode(Client* client, bool mode);
 
 

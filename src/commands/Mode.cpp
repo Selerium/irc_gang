@@ -80,53 +80,44 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 				client->SendServerToClient("Channel Topic | " + print_num(it->second->getTopicMode()) + " | " + it->second->getTopic() + "");
 				return ;
 			}
-
+			
 			if (parameter[1] == "+L" || parameter[1] == "+l")
 			{
 				if (parameter.size() == 3)
 				{
 					int num = std::atoi(parameter[2].c_str());
-					it->second->setLimiter(client, num);
+					it->second->setLimiter(client, num, parameter[2]);
 				}
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +l " + parameter[2]);
 			}
 			else if (parameter[1] == "-L" || parameter[1] == "-l") {
 				it->second->removeLimit(client);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -l ");
 			}
 			else if (parameter[1] == "+K" || parameter[1] == "+k")
 			{
 				it->second->setPass(client, parameter[2]);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +k " + parameter[2]);
 			}
 			else if (parameter[1] == "-K" || parameter[1] == "-k") {
 				it->second->removePass(client);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -k ");
 			}
 			else if (parameter[1] == "+I" || parameter[1] == "+i")
 			{
 				if (parameter.size() == 2)
 					it->second->setChannelMode(client, true);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +i ");
 			}
 			else if (parameter[1] == "-I" || parameter[1] == "-i")
 			{
 				if (parameter.size() == 2)
 					it->second->setChannelMode(client, false);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -i ");
 			}
 			else if (parameter[1] == "+O" || parameter[1] == "+o")
 			{
 				if (!it->second->FindClient(parameter[2])) {
 					client->SendServerToClient(client->getNickname() + " " + parameter[2] + " " + it->second->getChannelName() + " :" ERR_USERNOTINCHANNEL + " They aren't on that channel");
-					it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +o " + parameter[2]);
 					return ;
 				}
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
 				{
-					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
-					//:Wifey!~Wifey@5.195.225.158 MODE #cha1 +o Wifey_
-					it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +o " + parameter[2]);
+					it->second->Permissions(client, it->second->FindClient(parameter[2]), true, parameter[2]);
 				}
 			}
 			else if (parameter[1] == "-O" || parameter[1] == "-o")
@@ -136,20 +127,17 @@ void IRC::Mode::excuteMode(Parse *parse, Client* client, Server* server)
 					return ;
 				}
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
-					it->second->Permissions(client, it->second->FindClient(parameter[2]), false);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -o " + parameter[2]);
+					it->second->Permissions(client, it->second->FindClient(parameter[2]), false, parameter[2]);
 			}
 			else if (parameter[1] == "+T" || parameter[1] == "+t")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
-					it->second->Permissions(client, it->second->FindClient(parameter[2]), true);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " +t ");
+					it->second->SetTopicMode(client, true);
 			}
 			else if (parameter[1] == "-T" || parameter[1] == "-t")
 			{
 				if (parameter.size() == 3 && it->second->FindClient(parameter[2]))
-					it->second->Permissions(client, it->second->FindClient(parameter[2]), false);
-				it->second->sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + it->second->getChannelName() + " -t ");
+					it->second->SetTopicMode(client, false);
 			}
 			else {
 				client->SendServerToClient(client->getNickname() + " " + parameter[1] + " :is unknown mode char to me");
@@ -194,12 +182,13 @@ void Channel::removeLimit(Client* client)
 	if (checkPermission(client) == 1)
 	{
 		this->_setLimit = false;
+		sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " -l ");
 		return;
 	}
 	client->SendServerToClient(": No permissions");
 }
 
-void Channel::setLimiter(Client* client, int amount)
+void Channel::setLimiter(Client* client, int amount, std::string str)
 {
 	if (checkPermission(client) == 1)
 	{
@@ -211,6 +200,7 @@ void Channel::setLimiter(Client* client, int amount)
 		else
 			this->_limit = amount;
 		this->_setLimit = true;
+		sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " +l " + str);
 		return;
 	}
 	client->SendServerToClient(": No permissions");
@@ -220,7 +210,10 @@ void Channel::setLimiter(Client* client, int amount)
 void Channel::removePass(Client* client)
 {
 	if (checkPermission(client) == 1)
+	{
 		this->_Password = "";
+		sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " -k ");
+	}
 	else
 		client->SendServerToClient(": No permissions to change pass");
 }
@@ -228,7 +221,10 @@ void Channel::removePass(Client* client)
 void Channel::setPass(Client* client, std::string str)
 {
 	if (checkPermission(client) == 1)
+	{
 		this->_Password = str;
+		sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " +k " + str);
+	}
 	else
 		client->SendServerToClient(": No permissions to change pass");
 }
@@ -240,6 +236,10 @@ void Channel::setChannelMode(Client* client, bool mode)
 	{
 		client->SendServerToClient(": Mode changed!");
 		this->_inviteOnly = mode;
+		if (mode == true)
+			sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " +i ");
+		else 
+			sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " -i ");
 		// if (this->_inviteOnly == true)
 		// 	this->_limit = _clientAmount;
 	}
@@ -249,7 +249,7 @@ void Channel::setChannelMode(Client* client, bool mode)
 
 
 // · o: Give/take channel operator privilege
-void Channel::Permissions(Client* admin, Client* client, bool perm)
+void Channel::Permissions(Client* admin, Client* client, bool perm, std::string str)
 {
 	if (checkPermission(admin) != 1)
 	{
@@ -266,8 +266,18 @@ void Channel::Permissions(Client* admin, Client* client, bool perm)
 	if (it->first->getNickname() == client->getNickname())
 	{
 		if (perm == true)
+		{
 			it->second = 1;
-		else {
+			sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " +o " + str);
+		}
+		else if (perm == true && it->second != 2)
+		{
+			it->second = 0;
+			sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " -o " + str);
+			this->welcomeMsgChan2(it->first);
+		}
+		else
+		{
 			it->second = 0;
 			this->welcomeMsgChan2(it->first);
 		}
@@ -279,7 +289,13 @@ void Channel::Permissions(Client* admin, Client* client, bool perm)
 void Channel::SetTopicMode(Client* client, bool mode)
 {
 	if (checkPermission(client) == 1)
+	{
 		this->_topicMode = mode;
+		if (mode == true )
+			sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " +t ");
+		else 
+			sendToall(":" + client->getNickname() + "!" + client->getUsername() + " MODE " + getChannelName() + " -t ");
+	}
 	else
 		client->SendServerToClient(": No permissions to change mode");
 }
